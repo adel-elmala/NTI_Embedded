@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1675963915 source:c:\users\aya_enan\desktop\alasema\cahallenges\challenge_1\project_2\main.c
+	"Calculator.h"
+
+1675963576 c:\users\aya_enan\desktop\alasema\cahallenges\challenge_1\project_2\calculator.h
+
+1675963896 source:c:\users\aya_enan\desktop\alasema\cahallenges\challenge_1\project_2\calculator.c
+	"Calculator.h"
+

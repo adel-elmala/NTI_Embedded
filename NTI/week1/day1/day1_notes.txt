@@ -1,0 +1,4 @@
+research 
+
+1. memory mapped registers
+2. is main a keyword

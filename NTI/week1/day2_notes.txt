@@ -1,0 +1,21 @@
+pointers 
+
+
+
+type const * const name;
+1-- can const pointer to 
+
+
+int i ;    intger
+int *i ; pointer to int
+int **i; pointer to pointer to int
+int*(i*)();  pointer to fun returns pointer to int
+
+int * (*i[])(); array of pointer to funcs;
+
+
+int* i[5]; 
+int*i(); fun returns a pointer 
+int(*i)() pointer returns int 
+int*(*(*i)())[5]
+  
