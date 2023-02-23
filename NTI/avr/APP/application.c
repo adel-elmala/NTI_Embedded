@@ -29,6 +29,7 @@ uint8 keypadInputComplete = 0;
 unsigned int lhs = 0;
 unsigned int rhs = 0;
 unsigned int result = 0;
+uint8 error = 0;
 uint8 operator= 0;
 
 void calc_app(void)
@@ -37,24 +38,28 @@ void calc_app(void)
 
     while (1)
     {
-
         readLHS();
-
+        if (error)
+            continue;
         // read operator
         operator= keypadInput;
         //      update lcd
         lcd_sendData(keypadInput);
 
         readRHS();
+        if (error)
+            continue;
 
-        // wait for '='
-        while (keypadInputComplete == 0)
-            ;
+        // while (keypadInputComplete == 0)
+        //     ;
 
         calculator();
         //      update lcd
         lcd_clearAndHome();
         printResult();
+        validState();
+        // _delay_ms(500);
+
         keypadInputComplete = 0;
         lhs = 0;
         rhs = 0;
@@ -65,7 +70,15 @@ void readLHS(void)
 {
     // keypadInput = keypad_GetPress();
     getPressNoINTR();
+    if (!is_digit(keypadInput))
+    {
+        ErrorState();
+        // readLHS();
+        return;
+    }
+
     lcd_clearAndHome();
+    waitingState();
     while (is_digit(keypadInput))
     {
         // read lhs
@@ -84,13 +97,24 @@ void getPressNoINTR()
 }
 void readRHS(void)
 {
-    while (is_digit((getPressNoINTR(), keypadInput)) && (keypadInputComplete == 0))
+    getPressNoINTR();
+    if (!is_digit(keypadInput))
+    {
+        ErrorState();
+        // readRHS();
+        return;
+    }
+    // lcd_clearAndHome();
+
+    waitingState();
+    while (is_digit(keypadInput) && (keypadInputComplete == 0))
     // keypadInput = keypad_GetPress();
     {
         // read lhs
         rhs = rhs * 10 + ascii_to_decimal(keypadInput);
         //      update lcd
         lcd_sendData(keypadInput);
+        getPressNoINTR();
     }
 }
 unsigned int ascii_to_decimal(uint8 ascii)
@@ -100,13 +124,8 @@ unsigned int ascii_to_decimal(uint8 ascii)
 
 void startCalculation(void)
 {
-    // keypadInput = keypad_GetPress();
-    // lcd_sendData(keypadInput);
-    // _delay_ms(1000);
-
     if (is_equal_key(keypadInput))
     {
-        // lcd_displayString("intr");
         keypadInputComplete = 1;
     }
     else
@@ -125,9 +144,9 @@ void init_project(void)
     register_ext_int_callbacks(startCalculation, NULL, NULL);
 
     // init leds
-    DIO_vSetPinDirection(PORTA, PIN5, OUTPUT);
-    DIO_vSetPinDirection(PORTA, PIN6, OUTPUT);
-    DIO_vSetPinDirection(PORTA, PIN7, OUTPUT);
+    DIO_vSetPinDirection(LED_GREEN_PORT, LED_GREEN_PIN, OUTPUT);
+    DIO_vSetPinDirection(LED_YELLOW_PORT, LED_YELLOW_PIN, OUTPUT);
+    DIO_vSetPinDirection(LED_RED_PORT, LED_RED_PIN, OUTPUT);
 }
 void calculator(void)
 {
@@ -206,4 +225,38 @@ void init_ext_int(uint8 enableINT0, uint8 enableINT1, uint8 enableINT2)
         DIO_vSetPinDirection(PORTD, PIN3, INPUT);
     if (enableINT2 != 0)
         DIO_vSetPinDirection(PORTB, PIN2, INPUT);
+}
+
+void validState(void)
+{
+    DIO_vWritePin(LED_GREEN_PORT, LED_GREEN_PIN, HIGH);
+    DIO_vWritePin(LED_RED_PORT, LED_RED_PIN, LOW);
+    DIO_vWritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, LOW);
+    error = 0;
+}
+void waitingState(void)
+{
+    DIO_vWritePin(LED_GREEN_PORT, LED_GREEN_PIN, LOW);
+    DIO_vWritePin(LED_RED_PORT, LED_RED_PIN, LOW);
+    DIO_vWritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, HIGH);
+    error = 0;
+}
+void ErrorState(void)
+{
+    DIO_vWritePin(LED_GREEN_PORT, LED_GREEN_PIN, LOW);
+    DIO_vWritePin(LED_RED_PORT, LED_RED_PIN, HIGH);
+    DIO_vWritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, LOW);
+    lcd_clearAndHome();
+    lcd_displayString("Error!");
+    error = 1;
+
+    reset();
+}
+void reset(void)
+{
+    lhs = 0;
+    rhs = 0;
+    result = 0;
+    keypadInputComplete = 0;
+    // lcd_clearAndHome();
 }

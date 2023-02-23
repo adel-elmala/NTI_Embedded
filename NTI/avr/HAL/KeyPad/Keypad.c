@@ -57,7 +57,7 @@ inline uint8 buttonPressed(uint8 avoidLongPress)
 
     if (avoidLongPress == 1)
     {
-        while ((allHighMask & DIO_u8GetPortValue(keypad_input_port)) == (colsReading & allHighMask)) // to avoid long press
+        while ((allHighMask & DIO_u8GetPortValue(keypad_input_port)) == (colsReading & allHighMask)) // to handle long press
             ;
     }
 
