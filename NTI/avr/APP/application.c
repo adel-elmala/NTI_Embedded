@@ -10,7 +10,7 @@
 
 #include "calculator.h"
 
-#define F_CPU 16000000UL
+// #define F_CPU 16000000UL
 #include <util/delay.h>
 
 EXT_Int_Conf configuration = {
@@ -23,13 +23,13 @@ EXT_Int_Conf configuration = {
 
 };
 
-uint8 keypadInput = 0;
 uint8 keypadInputComplete = 0;
+uint8 error = 0;
 
+uint8 keypadInput = 0;
 unsigned int lhs = 0;
 unsigned int rhs = 0;
 unsigned int result = 0;
-uint8 error = 0;
 uint8 operator= 0;
 
 void calc_app(void)
@@ -43,22 +43,20 @@ void calc_app(void)
             continue;
         // read operator
         operator= keypadInput;
-        //      update lcd
+        // update lcd
         lcd_sendData(keypadInput);
 
         readRHS();
         if (error)
             continue;
 
-        // while (keypadInputComplete == 0)
-        //     ;
-
         calculator();
-        //      update lcd
+        if (error)
+            continue;
+        //  update lcd
         lcd_clearAndHome();
         printResult();
         validState();
-        // _delay_ms(500);
 
         keypadInputComplete = 0;
         lhs = 0;
@@ -68,12 +66,10 @@ void calc_app(void)
 }
 void readLHS(void)
 {
-    // keypadInput = keypad_GetPress();
     getPressNoINTR();
     if (!is_digit(keypadInput))
     {
         ErrorState();
-        // readLHS();
         return;
     }
 
@@ -83,9 +79,8 @@ void readLHS(void)
     {
         // read lhs
         lhs = lhs * 10 + ascii_to_decimal(keypadInput);
-        //      update lcd
+        //  update lcd
         lcd_sendData(keypadInput);
-        // keypadInput = keypad_GetPress();
         getPressNoINTR();
     }
 }
@@ -101,18 +96,15 @@ void readRHS(void)
     if (!is_digit(keypadInput))
     {
         ErrorState();
-        // readRHS();
         return;
     }
-    // lcd_clearAndHome();
 
     waitingState();
     while (is_digit(keypadInput) && (keypadInputComplete == 0))
-    // keypadInput = keypad_GetPress();
     {
         // read lhs
         rhs = rhs * 10 + ascii_to_decimal(keypadInput);
-        //      update lcd
+        // update lcd
         lcd_sendData(keypadInput);
         getPressNoINTR();
     }
@@ -133,7 +125,6 @@ void startCalculation(void)
 }
 void init_project(void)
 {
-
     // init keypad
     keypad_init();
     // init lcd
@@ -174,6 +165,11 @@ void calculator(void)
     case '/':
     {
         // check rhs = 0
+        if (rhs == 0)
+        {
+            ErrorState();
+            return;
+        }
         result = divide(lhs, rhs);
         break;
     }
@@ -186,9 +182,6 @@ void calculator(void)
 
     default:
     {
-        // lcd_displayString("OOOPPPS");
-        // lcd_sendData(operator);
-        // _delay_ms(2000);
         break;
     }
     }
