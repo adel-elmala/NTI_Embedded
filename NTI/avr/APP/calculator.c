@@ -1,22 +1,22 @@
 #include "calculator.h"
 
-uint8 add(uint8 a, uint8 b)
+unsigned int add(unsigned int a, unsigned int b)
 {
     return a + b;
 }
-uint8 subtract(uint8 a, uint8 b)
+unsigned int subtract(unsigned int a, unsigned int b)
 {
     return a - b;
 }
-uint8 multiply(uint8 a, uint8 b)
+unsigned int multiply(unsigned int a, unsigned int b)
 {
     return a * b;
 }
-uint8 divide(uint8 a, uint8 b)
+unsigned int divide(unsigned int a, unsigned int b)
 {
     return a / b;
 }
-uint8 modulus(uint8 a, uint8 b)
+unsigned int modulus(unsigned int a, unsigned int b)
 {
     return a % b;
 }

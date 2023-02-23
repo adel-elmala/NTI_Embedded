@@ -69,4 +69,7 @@ defined by the developer this pointer to function take void and returns void */
 void register_ext_int_callbacks(interrupt_callback_t int0_callback,
                                 interrupt_callback_t int1_callback,
                                 interrupt_callback_t int2_callback);
+void EXT_INT_Disable(void);
+void EXT_INT_Enable(void);
+
 #endif

@@ -17,6 +17,15 @@ interrupt_callback_t int0_callback = NULL, int1_callback = NULL, int2_callback =
 //     if (config.Enable_INT2_Interrupt)
 //         DIO_vSetPinDirection(PORTB, PIN2, INPUT);
 // }
+void EXT_INT_Disable(void)
+{
+    clearbit(SREG, GIE);
+}
+
+void EXT_INT_Enable(void)
+{
+    setbit(SREG, GIE);
+}
 void EXT_INT_SET_CONFIG(EXT_Int_Conf config)
 {
     setbit(SREG, GIE);

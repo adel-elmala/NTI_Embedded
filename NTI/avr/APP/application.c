@@ -37,15 +37,11 @@ void calc_app(void)
 
     while (1)
     {
-        // lcd_clearAndHome();
 
         readLHS();
 
         // read operator
-        // if (is_operator(keypadInput)) // should always be true
-        // {
         operator= keypadInput;
-        // }
         //      update lcd
         lcd_sendData(keypadInput);
 
@@ -60,11 +56,15 @@ void calc_app(void)
         lcd_clearAndHome();
         printResult();
         keypadInputComplete = 0;
+        lhs = 0;
+        rhs = 0;
+        result = 0;
     }
 }
 void readLHS(void)
 {
-    keypadInput = keypad_GetPress();
+    // keypadInput = keypad_GetPress();
+    getPressNoINTR();
     lcd_clearAndHome();
     while (is_digit(keypadInput))
     {
@@ -72,13 +72,19 @@ void readLHS(void)
         lhs = lhs * 10 + ascii_to_decimal(keypadInput);
         //      update lcd
         lcd_sendData(keypadInput);
-        keypadInput = keypad_GetPress();
+        // keypadInput = keypad_GetPress();
+        getPressNoINTR();
     }
 }
-
+void getPressNoINTR()
+{
+    EXT_INT_Disable();
+    keypadInput = keypad_GetPress();
+    EXT_INT_Enable();
+}
 void readRHS(void)
 {
-    while (is_digit(keypadInput = keypad_GetPress()) && (keypadInputComplete != 1))
+    while (is_digit((getPressNoINTR(), keypadInput)) && (keypadInputComplete == 0))
     // keypadInput = keypad_GetPress();
     {
         // read lhs
@@ -89,7 +95,7 @@ void readRHS(void)
 }
 unsigned int ascii_to_decimal(uint8 ascii)
 {
-    return (ascii - '0');
+    return (ascii - (unsigned int)'0');
 }
 
 void startCalculation(void)
@@ -98,13 +104,13 @@ void startCalculation(void)
     // lcd_sendData(keypadInput);
     // _delay_ms(1000);
 
-    // if (is_equal_key(keypadInput))
-    // {
-    // lcd_displayString("intr");
-    keypadInputComplete = 1;
-    // }
-    // else
-    //     keypadInputComplete = 0;
+    if (is_equal_key(keypadInput))
+    {
+        // lcd_displayString("intr");
+        keypadInputComplete = 1;
+    }
+    else
+        keypadInputComplete = 0;
 }
 void init_project(void)
 {
@@ -130,32 +136,32 @@ void calculator(void)
     {
     case '+':
     {
-        result = add((uint8)lhs, (uint8)rhs);
+        result = add(lhs, rhs);
         break;
     }
 
     case '-':
     {
-        result = subtract((uint8)lhs, (uint8)rhs);
+        result = subtract(lhs, rhs);
         break;
     }
 
     case '*':
     {
-        result = multiply((uint8)lhs, (uint8)rhs);
+        result = multiply(lhs, rhs);
         break;
     }
 
     case '/':
     {
         // check rhs = 0
-        result = divide((uint8)lhs, (uint8)rhs);
+        result = divide(lhs, rhs);
         break;
     }
 
     case '%':
     {
-        result = modulus((uint8)lhs, (uint8)rhs);
+        result = modulus(lhs, rhs);
         break;
     }
 

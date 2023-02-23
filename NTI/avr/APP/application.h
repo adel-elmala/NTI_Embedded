@@ -17,5 +17,6 @@ void readLHS(void);
 void readRHS(void);
 void calculator(void);
 void printResult();
+void getPressNoINTR();
 
 #endif
