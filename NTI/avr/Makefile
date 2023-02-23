@@ -1,5 +1,6 @@
 SRC = 	main.c\
 		APP/application.c\
+		APP/calculator.c\
 		MCAL/DIO/dio.c\
 		MCAL/EXT_INT/External_INT.c\
 		HAL/KeyPad/Keypad.c\

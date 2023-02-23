@@ -1,6 +1,7 @@
 #include "Keypad_Interface.h"
 #include "../../MCAL/DIO/DIO_Interface.h"
 #include "../../MCAL/DIO/DIO_REG.h"
+#include <util/delay.h>
 
 #define keypad_output_port PORTC
 #define keypad_input_port PORTD
@@ -18,10 +19,11 @@
 uint8 columns[4] = {COL1, COL2, COL3, COL4};
 uint8 rows[4] = {ROW1, ROW2, ROW3, ROW4};
 
-uint8 labels[4][4] = {{1, 2, 3, 4},
-                      {5, 6, 7, 8},
-                      {9, 10, 11, 12},
-                      {13, 14, 15, 16}};
+uint8 labels[4][4] = {
+    {'7', '8', '9', '/'},
+    {'4', '5', '6', '*'},
+    {'1', '2', '3', '-'},
+    {'%', '0', '=', '+'}};
 
 void keypad_init(void)
 {
@@ -93,6 +95,8 @@ uint8 keypad_GetPress(void)
     setAllRows(LOW);
     while ((colNumber = buttonPressed(0)) == 0)
         ;
+    // if ((colNumber = buttonPressed(0)) == 0)
+    //     _delay_ms(500);
     rowNumber = getRow();
     return labels[rowNumber - 1][colNumber - 1];
 }

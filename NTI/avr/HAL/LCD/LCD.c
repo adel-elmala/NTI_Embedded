@@ -17,7 +17,7 @@ void lcd_init(void)
     DIO_vSetPinDirection(LCD_DATA_PORT, LCD_DATA_3, OUTPUT);
 
     DIO_vSetPinDirection(LCD_CONTROL_PORT, LCD_CONTROL_RS, OUTPUT);
-    DIO_vSetPinDirection(LCD_CONTROL_PORT, LCD_CONTROL_RW, OUTPUT);
+    // DIO_vSetPinDirection(LCD_CONTROL_PORT, LCD_CONTROL_RW, OUTPUT); // hardware ground
     DIO_vSetPinDirection(LCD_CONTROL_PORT, LCD_CONTROL_E, OUTPUT);
     // set enable low
     DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_E, LOW);
@@ -31,6 +31,12 @@ void lcd_init(void)
     lcd_sendCommand(0x01); // clear lcd
     _delay_us(2000);
     lcd_sendCommand(0x06); // shift cursor right
+}
+void lcd_clearAndHome()
+{
+    lcd_sendCommand(0x01); // clear lcd
+    lcd_sendCommand(0x03); // clear lcd
+    _delay_us(2000);
 }
 void lcd_writeDataNibble(uint8 nibble)
 {
@@ -50,7 +56,7 @@ void lcd_sendCommand(uint8 commandCode)
 
     lcd_writeDataNibble(highNibble);
     DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_RS, LCD_COMMAND_REG);
-    DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_RW, LCD_WRITE);
+    // DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_RW, LCD_WRITE);// hardware ground
     enablePulse();
     _delay_us(100);
 
@@ -65,7 +71,7 @@ void lcd_sendData(uint8 data)
 
     lcd_writeDataNibble(highNibble);
     DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_RS, LCD_DATA_REG);
-    DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_RW, LCD_WRITE);
+    // DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_RW, LCD_WRITE); // hardware ground
     enablePulse();
     _delay_us(100);
 

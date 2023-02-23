@@ -2,11 +2,6 @@
 
 void main()
 {
-    testLCD();
-    while (1)
-    {
-        /* code */
-        // app_start();
-        // testKeypad();
-    }
+    // testLCD();
+    calc_app();
 }

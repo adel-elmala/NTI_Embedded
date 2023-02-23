@@ -8,42 +8,191 @@
 #include "../HAL/KeyPad/Keypad_Interface.h"
 #include "../HAL/LCD/LCD_Interface.h"
 
-// #define F_CPU 16000000UL
-// #include <util/delay.h>
+#include "calculator.h"
 
-EXT_Int_Conf configuration =
-    {
-        DISABLE_INT,
-        DISABLE_INT,
-        ENABLE_INT2,
-        RISING_EDGE_MODE,
-        RISING_EDGE_MODE,
-        RISING_EDGE_MODE};
+#define F_CPU 16000000UL
+#include <util/delay.h>
 
-void app_start()
+EXT_Int_Conf configuration = {
+    ENABLE_INT0,
+    DISABLE_INT,
+    DISABLE_INT,
+    RISING_EDGE_MODE,
+    FALLING_EDGE_MODE,
+    FALLING_EDGE_MODE
+
+};
+
+uint8 keypadInput = 0;
+uint8 keypadInputComplete = 0;
+
+unsigned int lhs = 0;
+unsigned int rhs = 0;
+unsigned int result = 0;
+uint8 operator= 0;
+
+void calc_app(void)
 {
-    DIO_vSetPortDirection(PORTA, OUTPUT);
-    EXT_INT_SET_CONFIG(configuration);
-    init_ext_int(0, 0, 1);
-    register_ext_int_callbacks(led_blink, led_blink, led_blink);
+    init_project();
+
     while (1)
     {
-        volatile unsigned long cnt = 0;
-        DIO_vTogglePin(PORTA, PIN1);
-        while (cnt < 25000)
-        {
-            cnt++;
-        }
+        // lcd_clearAndHome();
+
+        readLHS();
+
+        // read operator
+        // if (is_operator(keypadInput)) // should always be true
+        // {
+        operator= keypadInput;
+        // }
+        //      update lcd
+        lcd_sendData(keypadInput);
+
+        readRHS();
+
+        // wait for '='
+        while (keypadInputComplete == 0)
+            ;
+
+        calculator();
+        //      update lcd
+        lcd_clearAndHome();
+        printResult();
+        keypadInputComplete = 0;
     }
 }
-void led_blink(void)
+void readLHS(void)
 {
-    DIO_vTogglePin(PORTA, PIN5);
-    // DIO_vTogglePort(PORTA);
+    keypadInput = keypad_GetPress();
+    lcd_clearAndHome();
+    while (is_digit(keypadInput))
+    {
+        // read lhs
+        lhs = lhs * 10 + ascii_to_decimal(keypadInput);
+        //      update lcd
+        lcd_sendData(keypadInput);
+        keypadInput = keypad_GetPress();
+    }
+}
+
+void readRHS(void)
+{
+    while (is_digit(keypadInput = keypad_GetPress()) && (keypadInputComplete != 1))
+    // keypadInput = keypad_GetPress();
+    {
+        // read lhs
+        rhs = rhs * 10 + ascii_to_decimal(keypadInput);
+        //      update lcd
+        lcd_sendData(keypadInput);
+    }
+}
+unsigned int ascii_to_decimal(uint8 ascii)
+{
+    return (ascii - '0');
+}
+
+void startCalculation(void)
+{
+    // keypadInput = keypad_GetPress();
+    // lcd_sendData(keypadInput);
+    // _delay_ms(1000);
+
+    // if (is_equal_key(keypadInput))
+    // {
+    // lcd_displayString("intr");
+    keypadInputComplete = 1;
+    // }
+    // else
+    //     keypadInputComplete = 0;
+}
+void init_project(void)
+{
+
+    // init keypad
+    keypad_init();
+    // init lcd
+    lcd_init();
+    // init ext interrupt
+    EXT_INT_SET_CONFIG(configuration);
+    init_ext_int(1, 0, 0);
+    register_ext_int_callbacks(startCalculation, NULL, NULL);
+
+    // init leds
+    DIO_vSetPinDirection(PORTA, PIN5, OUTPUT);
+    DIO_vSetPinDirection(PORTA, PIN6, OUTPUT);
+    DIO_vSetPinDirection(PORTA, PIN7, OUTPUT);
+}
+void calculator(void)
+{
+
+    switch (operator)
+    {
+    case '+':
+    {
+        result = add((uint8)lhs, (uint8)rhs);
+        break;
+    }
+
+    case '-':
+    {
+        result = subtract((uint8)lhs, (uint8)rhs);
+        break;
+    }
+
+    case '*':
+    {
+        result = multiply((uint8)lhs, (uint8)rhs);
+        break;
+    }
+
+    case '/':
+    {
+        // check rhs = 0
+        result = divide((uint8)lhs, (uint8)rhs);
+        break;
+    }
+
+    case '%':
+    {
+        result = modulus((uint8)lhs, (uint8)rhs);
+        break;
+    }
+
+    default:
+    {
+        // lcd_displayString("OOOPPPS");
+        // lcd_sendData(operator);
+        // _delay_ms(2000);
+        break;
+    }
+    }
+}
+
+void printResult()
+{
+    uint8 digits[16] = {0};
+    uint8 digit;
+    int i = 0;
+    if (result == 0)
+    {
+        lcd_sendData('0');
+        return;
+    }
+    while (result)
+    {
+        digit = result % 10;
+        result /= 10;
+        digits[i] = (uint8)(digit + 48);
+        i++;
+        // lcd_sendData('9');
+    }
+    while (i--)
+
+        lcd_sendData(digits[i]);
 }
 
 void init_ext_int(uint8 enableINT0, uint8 enableINT1, uint8 enableINT2)
-
 {
     if (enableINT0 != 0)
         DIO_vSetPinDirection(PORTD, PIN2, INPUT);
@@ -51,33 +200,4 @@ void init_ext_int(uint8 enableINT0, uint8 enableINT1, uint8 enableINT2)
         DIO_vSetPinDirection(PORTD, PIN3, INPUT);
     if (enableINT2 != 0)
         DIO_vSetPinDirection(PORTB, PIN2, INPUT);
-}
-
-void testKeypad()
-{
-    DIO_vSetPinDirection(PORTA, PIN0, OUTPUT);
-    DIO_vSetPinDirection(PORTA, PIN1, OUTPUT);
-    DIO_vSetPinDirection(PORTA, PIN2, OUTPUT);
-    keypad_init();
-    volatile uint8 result = keypad_GetPress();
-
-    if (result == 5)
-        // DIO_vWritePin(PORTA, PIN0, HIGH);
-        DIO_vTogglePin(PORTA, PIN0);
-
-    else if (result == 9)
-        // DIO_vWritePin(PORTA, PIN1, HIGH);
-        DIO_vTogglePin(PORTA, PIN1);
-
-    else if (result == 13)
-        // DIO_vWritePin(PORTA, PIN2, HIGH);
-        DIO_vTogglePin(PORTA, PIN2);
-}
-
-void testLCD()
-{
-
-    lcd_init();
-    lcd_displayString("Hello AVR!");
-    // lcd_sendData('%');
 }

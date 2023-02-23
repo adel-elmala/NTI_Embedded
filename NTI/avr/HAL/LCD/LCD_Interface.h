@@ -16,16 +16,16 @@
 #define LCD_DATA_0 PIN0
 #define LCD_DATA_1 PIN1
 #define LCD_DATA_2 PIN2
-#define LCD_DATA_3 PIN3
+#define LCD_DATA_3 PIN4
 
-#define LCD_DATA_4 PIN4
-#define LCD_DATA_5 PIN5
-#define LCD_DATA_6 PIN6
-#define LCD_DATA_7 PIN7
+// #define LCD_DATA_4 PIN4
+// #define LCD_DATA_5 PIN5
+// #define LCD_DATA_6 PIN6
+// #define LCD_DATA_7 PIN7
 
-#define LCD_CONTROL_RS PIN5
+#define LCD_CONTROL_RS PIN3
 #define LCD_CONTROL_RW PIN6
-#define LCD_CONTROL_E PIN7
+#define LCD_CONTROL_E PIN2
 
 #define LCD_8bit_MODE 8
 #define LCD_4bit_MODE 4
@@ -39,5 +39,6 @@ void lcd_init(void);
 void lcd_sendCommand(uint8 commandCode);
 void lcd_sendData(uint8 data);
 void lcd_displayString(char *string);
+void lcd_clearAndHome();
 
 #endif
