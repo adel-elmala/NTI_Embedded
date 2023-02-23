@@ -25,6 +25,7 @@ EXT_Int_Conf configuration = {
 
 uint8 keypadInputComplete = 0;
 uint8 error = 0;
+uint8 restart = 0;
 
 uint8 keypadInput = 0;
 unsigned int lhs = 0;
@@ -39,15 +40,16 @@ void calc_app(void)
     while (1)
     {
         readLHS();
-        if (error)
+        if (error || restart)
             continue;
         // read operator
+
         operator= keypadInput;
         // update lcd
         lcd_sendData(keypadInput);
 
         readRHS();
-        if (error)
+        if (error || restart)
             continue;
 
         calculator();
@@ -72,6 +74,11 @@ void readLHS(void)
         ErrorState();
         return;
     }
+    else if ((keypadInput == 'c'))
+    {
+        clearState();
+        return;
+    }
 
     lcd_clearAndHome();
     waitingState();
@@ -82,6 +89,11 @@ void readLHS(void)
         //  update lcd
         lcd_sendData(keypadInput);
         getPressNoINTR();
+        if ((keypadInput == 'c'))
+        {
+            clearState();
+            break;
+        }
     }
 }
 void getPressNoINTR()
@@ -93,7 +105,7 @@ void getPressNoINTR()
 void readRHS(void)
 {
     getPressNoINTR();
-    if (!is_digit(keypadInput))
+    if (!is_digit(keypadInput) || (keypadInput == 'c'))
     {
         ErrorState();
         return;
@@ -107,6 +119,12 @@ void readRHS(void)
         // update lcd
         lcd_sendData(keypadInput);
         getPressNoINTR();
+        if ((keypadInput == 'c'))
+        {
+            // restart = 1;
+            clearState();
+            break;
+        }
     }
 }
 unsigned int ascii_to_decimal(uint8 ascii)
@@ -226,6 +244,7 @@ void validState(void)
     DIO_vWritePin(LED_RED_PORT, LED_RED_PIN, LOW);
     DIO_vWritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, LOW);
     error = 0;
+    restart = 0;
 }
 void waitingState(void)
 {
@@ -233,6 +252,7 @@ void waitingState(void)
     DIO_vWritePin(LED_RED_PORT, LED_RED_PIN, LOW);
     DIO_vWritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, HIGH);
     error = 0;
+    restart = 0;
 }
 void ErrorState(void)
 {
@@ -242,6 +262,18 @@ void ErrorState(void)
     lcd_clearAndHome();
     lcd_displayString("Error!");
     error = 1;
+
+    reset();
+}
+
+void clearState(void)
+{
+    DIO_vWritePin(LED_GREEN_PORT, LED_GREEN_PIN, HIGH);
+    DIO_vWritePin(LED_RED_PORT, LED_RED_PIN, LOW);
+    DIO_vWritePin(LED_YELLOW_PORT, LED_YELLOW_PIN, LOW);
+    lcd_clearAndHome();
+    // lcd_displayString("Error!");
+    restart = 1;
 
     reset();
 }

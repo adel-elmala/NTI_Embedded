@@ -102,12 +102,6 @@ void EXT_INT_SET_CONFIG(EXT_Int_Conf config)
         clearbit(GICR, ENABLE_INT2);
 }
 
-/* Note that interrupt_callback_t is a pointer to function that should
-defined by the developer this pointer to function take void and returns void */
-// void external_interrupt_register_callback(interrupt_callback_t callback)
-// {
-// }
-
 void register_ext_int_callbacks(interrupt_callback_t int0_clback,
                                 interrupt_callback_t int1_clback,
                                 interrupt_callback_t int2_clback)
@@ -121,7 +115,6 @@ ISR(EXT_INT0)
 {
     if (int0_callback != NULL)
         (*int0_callback)();
-    // led_blink();
 }
 
 ISR(EXT_INT1)

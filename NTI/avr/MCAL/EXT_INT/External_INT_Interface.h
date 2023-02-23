@@ -45,9 +45,6 @@ typedef struct
 /*********** MCUCSR PINS ****************/
 #define ISC2 6
 
-/*********** SREG PINS ****************/
-// #define I 7
-
 /*********** External Interrupt vectors ****************/
 
 #define EXT_INT0 __vector_1
@@ -61,15 +58,13 @@ typedef struct
     void vector(void)
 
 /*********** External_Interrupt APIS ****************/
-// void EXT_INT_Init(void);
+
 void EXT_INT_SET_CONFIG(EXT_Int_Conf config);
-/* Note that interrupt_callback_t is a pointer to function that should
-defined by the developer this pointer to function take void and returns void */
-// void external_interrupt_register_callback(interrupt_callback_t callback);
+
 void register_ext_int_callbacks(interrupt_callback_t int0_callback,
                                 interrupt_callback_t int1_callback,
                                 interrupt_callback_t int2_callback);
-void EXT_INT_Disable(void);
-void EXT_INT_Enable(void);
+void EXT_INT_Disable(void); // disable interrupts
+void EXT_INT_Enable(void);  // enable interrupts
 
 #endif

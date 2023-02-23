@@ -31,5 +31,6 @@ void validState(void);
 void waitingState(void);
 void ErrorState(void);
 void reset(void);
+void clearState(void);
 
 #endif
