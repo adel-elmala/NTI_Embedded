@@ -3,7 +3,7 @@
 #include "../LIB/Datatypes.h"
 
 unsigned int add(unsigned int a, unsigned int b);      // Adds two numbers and returns the result.
-unsigned int subtract(unsigned int a, unsigned int b); // Subtracts two numbers and returns the result.
+int subtract(unsigned int a, unsigned int b);          // Subtracts two numbers and returns the result.
 unsigned int multiply(unsigned int a, unsigned int b); // Multiplies two numbers and returns the result.
 unsigned int divide(unsigned int a, unsigned int b);   // Divides two numbers and returns the result.
 unsigned int modulus(unsigned int a, unsigned int b);  // Calculates the modulus of two numbers and returns the result.

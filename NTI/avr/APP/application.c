@@ -12,14 +12,15 @@
 
 // #define F_CPU 16000000UL
 #include <util/delay.h>
+#include <stdio.h>
 
 EXT_Int_Conf configuration = {
-    ENABLE_INT0,
     DISABLE_INT,
+    ENABLE_INT1,
     DISABLE_INT,
     RISING_EDGE_MODE,
-    FALLING_EDGE_MODE,
-    FALLING_EDGE_MODE
+    RISING_EDGE_MODE,
+    RISING_EDGE_MODE
 
 };
 
@@ -30,7 +31,8 @@ uint8 restart = 0;
 uint8 keypadInput = 0;
 unsigned int lhs = 0;
 unsigned int rhs = 0;
-unsigned int result = 0;
+int result = 0;
+uint8 negR = 0;
 uint8 operator= 0;
 
 void calc_app(void)
@@ -149,8 +151,8 @@ void init_project(void)
     lcd_init();
     // init ext interrupt
     EXT_INT_SET_CONFIG(configuration);
-    init_ext_int(1, 0, 0);
-    register_ext_int_callbacks(startCalculation, NULL, NULL);
+    init_ext_int(0, 1, 0);
+    register_ext_int_callbacks(startCalculation, startCalculation, startCalculation);
 
     // init leds
     DIO_vSetPinDirection(LED_GREEN_PORT, LED_GREEN_PIN, OUTPUT);
@@ -210,22 +212,30 @@ void printResult()
     uint8 digits[16] = {0};
     uint8 digit;
     int i = 0;
+    int tmp = result;
+
     if (result == 0)
     {
         lcd_sendData('0');
         return;
     }
-    while (result)
-    {
-        digit = result % 10;
-        result /= 10;
-        digits[i] = (uint8)(digit + 48);
-        i++;
-        // lcd_sendData('9');
-    }
-    while (i--)
+    // while (result)
+    // {
+    //     digit = result % 10;
+    //     result /= 10;
+    //     digits[i] = (uint8)(digit + 48);
+    //     i++;
+    //     // lcd_sendData('9');
+    // }
 
-        lcd_sendData(digits[i]);
+    // // if (tmp < 0)
+    // //     digits[i] = (uint8)'-';
+    // while (i--)
+    //     lcd_sendData(digits[i]);
+
+    char str[16] = {0};
+    sprintf(str, "%d", result);
+    lcd_displayString(str);
 }
 
 void init_ext_int(uint8 enableINT0, uint8 enableINT1, uint8 enableINT2)

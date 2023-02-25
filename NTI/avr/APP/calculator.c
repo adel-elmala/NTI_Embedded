@@ -1,11 +1,13 @@
 #include "calculator.h"
 
+extern negR;
 unsigned int add(unsigned int a, unsigned int b)
 {
     return a + b;
 }
-unsigned int subtract(unsigned int a, unsigned int b)
+int subtract(unsigned int a, unsigned int b)
 {
+
     return a - b;
 }
 unsigned int multiply(unsigned int a, unsigned int b)
