@@ -1,6 +1,7 @@
 #include "Keypad_Interface.h"
 #include "../../MCAL/DIO/DIO_Interface.h"
 #include "../../MCAL/DIO/DIO_REG.h"
+#define F_CPU 8000000UL
 #include <util/delay.h>
 
 #define keypad_output_port PORTC

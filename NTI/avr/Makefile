@@ -5,6 +5,7 @@ SRC = 	main.c\
 		MCAL/DIO/dio.c\
 		MCAL/EXT_INT/External_INT.c\
 		MCAL/TIMER/timer.c\
+		MCAL/PWM/PWM.c\
 		HAL/KeyPad/Keypad.c\
 		HAL/LCD/LCD.c\
 
@@ -16,8 +17,8 @@ FLASHER = usbasp
 F_CPU = 8000000UL 
 BAUD  = 9600UL
 
-CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU)  
-# CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU) -DF_CPU=$(F_CPU) -DBAUD=$(BAUD)
+# CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU)  
+CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU) -DF_CPU=$(F_CPU) -DBAUD=$(BAUD)
 
 INCLUDE  = -I./utils
 INCLUDE += -I./MCAL
@@ -25,7 +26,7 @@ INCLUDE += -I./HAL
 INCLUDE += -I/lib/avr/include
 
 LD_AVR = -L/lib/avr/lib/avr5 -latmega32a
-LD_AVR = 
+# LD_AVR = 
 
 all: compile build flash
 

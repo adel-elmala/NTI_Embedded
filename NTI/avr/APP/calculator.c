@@ -1,6 +1,5 @@
 #include "calculator.h"
 
-extern negR;
 unsigned int add(unsigned int a, unsigned int b)
 {
     return a + b;

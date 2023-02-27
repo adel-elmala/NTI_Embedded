@@ -10,7 +10,7 @@
 
 #include "calculator.h"
 
-// #define F_CPU 16000000UL
+#define F_CPU 8000000UL
 #include <util/delay.h>
 #include <stdio.h>
 
@@ -32,7 +32,6 @@ uint8 keypadInput = 0;
 unsigned int lhs = 0;
 unsigned int rhs = 0;
 int result = 0;
-uint8 negR = 0;
 uint8 operator= 0;
 
 void calc_app(void)
@@ -209,10 +208,12 @@ void calculator(void)
 
 void printResult()
 {
-    uint8 digits[16] = {0};
-    uint8 digit;
-    int i = 0;
-    int tmp = result;
+    // uint8 digits[16] = {0};
+    char str[16] = {0};
+
+    // uint8 digit;
+    // int i = 0;
+    // int tmp = result;
 
     if (result == 0)
     {
@@ -233,7 +234,6 @@ void printResult()
     // while (i--)
     //     lcd_sendData(digits[i]);
 
-    char str[16] = {0};
     sprintf(str, "%d", result);
     lcd_displayString(str);
 }

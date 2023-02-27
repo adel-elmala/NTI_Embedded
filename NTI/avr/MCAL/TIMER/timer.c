@@ -2,8 +2,9 @@
 #include "timer_regs.h"
 #include "../../LIB/Calcbit.h"
 
-static Timer_Config Config = {TIMER0_NORMAL_MODE, TIMER0_INTR_DISABLE, PRESCALER_1};
-// static Timer_Config Config = {TIMER0_CTC_MODE, TIMER0_INTR_DISABLE, PRESCALER_1};
+// static Timer_Config Config = {TIMER0_NORMAL_MODE, TIMER0_INTR_DISABLE};
+static Timer_Config Config = {TIMER0_CTC_MODE, TIMER0_INTR_DISABLE};
+
 void TIMER0_SetConfig()
 {
     // setup TCCR0
@@ -42,7 +43,7 @@ void stopTimer0()
 {
     set_Timer0_Prescaler(PRESCALER_CLEAR);
 }
-void set_Timer0_Prescaler(uint16 prescaler)
+inline void set_Timer0_Prescaler(uint16 prescaler)
 {
     switch (prescaler)
     {
@@ -116,117 +117,97 @@ void set_Timer0_Prescaler(uint16 prescaler)
     }
 }
 
-void TIMER0_Delay_Milli_Seconds_with_Blocking(uint16 Milli_Seconds)
+void TIMER0_Delay_ms_with_Blocking(uint16 Milli_Seconds)
 {
-    double tick_time = (double)Config.Prescaler / F_CPU;
-    double number_of_counts = (double)Milli_Seconds / (1000 * tick_time);
-    double n_overflows = (double)number_of_counts / (TIMER0_MAX_COUNT + 1);
-    // double frac = n_overflows - (long)n_overflows;
-    // int remaining = frac * number_of_counts;
-    // int start_from_at_first = (TIMER0_MAX_COUNT + 1) - remaining;
-    if (n_overflows > (double)((int)n_overflows)) // ceil
-        n_overflows = ((int)n_overflows) + 1;
-    int counts_per_overflow = number_of_counts / n_overflows;
-    int initial_value = (TIMER0_MAX_COUNT + 1) - counts_per_overflow;
+    // calculate the correct prescale to make the time_to_overflow == 1 ms
+    uint16 correct_prescaler = PRESCALER_64;
 
+    // uint8 ticks_to_1ms = 250; // for 16-MHZ clock
+    uint8 ticks_to_1ms = 125; // for 8-MHZ clock
+
+    // loop on Milli_Seconds and poll on the overflow flag and decrement Milli_Seconds
     switch (Config.Mode)
     {
     case TIMER0_NORMAL_MODE:
     {
-        double overFlow_counter = 0;
-        // load with initial value
-        TCNT0 = (uint8)initial_value;
-        while (overFlow_counter < n_overflows)
+        TCNT0 = TIMER0_MAX_COUNT - ticks_to_1ms;
+        set_Timer0_Prescaler(correct_prescaler);
+        while (Milli_Seconds)
         {
 
-            set_Timer0_Prescaler(Config.Prescaler); // select clock -> start timer
-            while (getbit(TIFR, TIRF_TOV0) == 0)    // poll-on overflow flag
+            while (getbit(TIFR, TIRF_TOV0) == 0) // poll on the overflow-flag
                 ;
-            stopTimer0();
-            setbit(TIFR, TIRF_TOV0);      // clear overflow flag
-            TCNT0 = (uint8)initial_value; // init counter reg
-            overFlow_counter++;
+            TCNT0 = TIMER0_MAX_COUNT - ticks_to_1ms;
+            setbit(TIFR, TIRF_TOV0);
+            Milli_Seconds--;
         }
         break;
     }
-
     case TIMER0_CTC_MODE:
     {
-
-        double overFlow_counter = 0;
-        OCR0 = (uint8)counts_per_overflow; // load the compared on value
-        while (overFlow_counter < n_overflows)
+        OCR0 = (uint8)ticks_to_1ms;
+        set_Timer0_Prescaler(PRESCALER_64);
+        // TCCR0 = (TCCR0 & 0xF8) | 0x03;
+        while (Milli_Seconds)
         {
-            set_Timer0_Prescaler(Config.Prescaler); // select clock -> start timer
-            while (getbit(TIFR, TIRF_OCF0) == 0)    // poll-on overflow flag
-                ;
-            stopTimer0();
-            overFlow_counter++;
-            setbit(TIFR, TIRF_OCF0);
-        }
 
+            while (getbit(TIFR, TIRF_OCF0) == 0) // poll on the compare-flag
+                ;
+            setbit(TIFR, TIRF_OCF0);
+            Milli_Seconds--;
+        }
         break;
     }
-
     default:
         break;
     }
+    stopTimer0();
+    // TCCR0 &= 0xF8;
 }
 
-void TIMER0_Delay_MicroSeconds_with_Blocking(uint16 Micro_Seconds)
+void TIMER0_Delay_us_with_Blocking(uint16 Micro_Seconds)
 {
-    double tick_time = (double)Config.Prescaler / F_CPU;
-    double number_of_counts = (double)Micro_Seconds / (1000000 * tick_time);
-    double n_overflows = (double)number_of_counts / TIMER0_MAX_COUNT;
-    if (n_overflows > (double)((unsigned int)n_overflows)) // ceil
-        n_overflows = ((unsigned int)n_overflows) + 1;
-    int counts_per_overflow = number_of_counts / n_overflows;
-    int initial_value = (TIMER0_MAX_COUNT + 1) - counts_per_overflow;
+    // calculate the correct prescale to make the time_to_overflow == 1 ms
+    uint16 correct_prescaler = PRESCALER_1;
 
+    // uint8 ticks_to_1us = 16 ; // for 16-MHZ clock
+    uint8 ticks_to_1us = 8; // for 8-MHZ clock
+
+    // loop on Milli_Seconds and poll on the overflow flag and decrement Milli_Seconds
     switch (Config.Mode)
     {
     case TIMER0_NORMAL_MODE:
     {
-        double overFlow_counter = 0;
-        // load with initial value
-        TCNT0 = (uint8)initial_value;
-        while (overFlow_counter < n_overflows)
+        TCNT0 = TIMER0_MAX_COUNT - ticks_to_1us;
+        set_Timer0_Prescaler(correct_prescaler);
+        while (Micro_Seconds)
         {
 
-            set_Timer0_Prescaler(Config.Prescaler); // select clock -> start timer
-            while (getbit(TIFR, TIRF_TOV0) == 0)    // poll-on overflow flag
+            while (getbit(TIFR, TIRF_TOV0) == 0) // poll on the overflow-flag
                 ;
-            stopTimer0();
-            setbit(TIFR, TIRF_TOV0); // clear overflow flag
-            // TCNT0 = (uint8)initial_value; // init counter reg
-            overFlow_counter++;
+            TCNT0 = TIMER0_MAX_COUNT - ticks_to_1us;
+            setbit(TIFR, TIRF_TOV0);
+            Micro_Seconds--;
         }
         break;
     }
-
     case TIMER0_CTC_MODE:
     {
-
-        double overFlow_counter = 0;
-        OCR0 = (uint8)counts_per_overflow; // load the compared on value
-        while (overFlow_counter < n_overflows)
+        OCR0 = ticks_to_1us;
+        set_Timer0_Prescaler(correct_prescaler);
+        while (Micro_Seconds)
         {
-            set_Timer0_Prescaler(Config.Prescaler); // select clock -> start timer
-            while (getbit(TIFR, TIRF_OCF0) == 0)    // poll-on overflow flag
+            // TCCR0 = (TCCR0 & PRESCALER_CLEAR) | 0x01;
+            while (getbit(TIFR, TIRF_OCF0) == 0) // poll on the overflow-flag
                 ;
-            stopTimer0();
-            overFlow_counter++;
             setbit(TIFR, TIRF_OCF0);
+            Micro_Seconds--;
         }
-
         break;
     }
-
     default:
         break;
     }
-}
 
-void TIMER0_Delay_Without_Blocking(uint16 Milli_Seconds)
-{
+    stopTimer0();
 }

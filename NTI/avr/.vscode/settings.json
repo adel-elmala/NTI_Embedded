@@ -3,6 +3,7 @@
     "dio_interface.h": "c",
     "datatypes.h": "c",
     "external_int_interface.h": "c",
-    "timer.h": "c"
+    "timer.h": "c",
+    "pwm_interface.h": "c"
   }
 }
