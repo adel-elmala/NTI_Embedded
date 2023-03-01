@@ -4,7 +4,7 @@
 #include "../../LIB/Datatypes.h"
 
 typedef void (*interrupt_callback_t)(void);
-#define NULL ((void *)0)
+// #define NULL ((void *)0)
 
 /************* Modes ***********************/
 // Modes that will be used for the external interrupt configuration

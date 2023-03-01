@@ -6,6 +6,7 @@ SRC = 	main.c\
 		MCAL/EXT_INT/External_INT.c\
 		MCAL/TIMER/timer.c\
 		MCAL/PWM/PWM.c\
+		MCAL/ADC/ADC.c\
 		HAL/KeyPad/Keypad.c\
 		HAL/LCD/LCD.c\
 
@@ -14,7 +15,8 @@ OBJ = $(subst .c,.o, $(SRC))
 
 MCU = atmega32
 FLASHER = usbasp
-F_CPU = 8000000UL 
+# F_CPU = 8000000UL 
+F_CPU = 16000000UL 
 BAUD  = 9600UL
 
 # CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU)  
@@ -54,4 +56,5 @@ clean:
 
 sim:
 	simavr -g -m $(MCU) ./bin/main.elf
-
+gdb:
+	avr-gdb -x gdb-commands -tui 

@@ -3,5 +3,6 @@
 
 void test_timer0(void);
 void test_pwm(void);
+void test_adc();
 
 #endif

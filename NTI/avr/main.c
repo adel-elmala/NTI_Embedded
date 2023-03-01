@@ -6,5 +6,6 @@ void main()
     // testLCD();
     // calc_app();
     // test_timer0();
-    test_pwm();
+    // test_pwm();
+    test_adc();
 }

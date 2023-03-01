@@ -2,7 +2,7 @@
 #define TIMER_REGS_H
 
 // #define F_CPU 16000000UL
-#define F_CPU 8000000UL
+// #define F_CPU 8000000UL
 #define TIMER0_MAX_COUNT (256)
 
 #define TIMER0_TICK_TIME_NO_PRESCALE (1.0 / (double)F_CPU)
