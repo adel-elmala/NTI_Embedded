@@ -40,5 +40,6 @@ void lcd_sendCommand(uint8 commandCode);
 void lcd_sendData(uint8 data);
 void lcd_displayString(char *string);
 void lcd_clearAndHome();
+void lcd_goto_line2();
 
 #endif

@@ -1,6 +1,7 @@
 #include "ADC_Interface.h"
 #include "../../LIB/Calcbit.h"
 static uint16 g_result_adjust;
+static double g_adc_step;
 func_ptr_t ADC_ISR_callback = NULL;
 
 void ADC_setPrescaler(void)
@@ -58,18 +59,21 @@ void ADC_setVref(uint8 vrefSelect)
     {
         clearbit(ADMUX, ADMUX_REFS0);
         clearbit(ADMUX, ADMUX_REFS1);
+        g_adc_step = ADC_AREF_VOLT_VALUE / ADC_RESLUTION;
         break;
     }
     case ADC_REFVOLTAGE_AVCC:
     {
         setbit(ADMUX, ADMUX_REFS0);
         clearbit(ADMUX, ADMUX_REFS1);
+        g_adc_step = ADC_AVCC_VOLT_VALUE / ADC_RESLUTION;
         break;
     }
     case ADC_REFVOLTAGE_INTERNAL:
     {
         setbit(ADMUX, ADMUX_REFS0);
         setbit(ADMUX, ADMUX_REFS1);
+        g_adc_step = ADC_INTERNAL_VOLT_VALUE / ADC_RESLUTION;
         break;
     }
     default:
@@ -284,28 +288,30 @@ uint16 ADC_getReading(uint8 *low, uint8 *high)
     // ADC Start Conversion
     // ADSC -> ADCSRA
     uint16 result;
-    uint16 tmp = 0;
+    // uint16 tmp = 0;
 
     if (g_result_adjust == ADC_LEFT_ADJUST)
     {
-        result = (ADCL) >> 6;
-        *low = ADCL;
-        tmp = ADCH;
-        *high = ADCH;
-        result |= (tmp << 2);
+        // result = (ADCL) >> 6;
+        // *low = ADCL;
+        // tmp = ADCH;
+        // *high = ADCH;
+        // result |= (tmp << 2);
+        result = (ADCDATA) >> 6;
     }
     else
     {
+        // result = ADCL;
+        // *low = ADCL;
+        // tmp = ADCH;
+        // *high = ADCH;
+        // result |= (tmp << 8);
 
-        result = ADCL;
-        *low = ADCL;
-        tmp = ADCH;
-        *high = ADCH;
-        result |= (tmp << 8);
+        result = ADCDATA;
     }
     return result;
 }
-uint16 ADC_PollRead(uint8 *low, uint8 *high)
+unsigned int ADC_PollRead(uint8 *low, uint8 *high)
 {
     // ADC Start Conversion
     // ADSC -> ADCSRA
@@ -313,7 +319,8 @@ uint16 ADC_PollRead(uint8 *low, uint8 *high)
     while ((getbit(ADCSRA, ADCSRA_ADIF) == LOW)) // / conversion in progress
         ;
     setbit(ADCSRA, ADCSRA_ADIF); // clear flag
-    return ADC_getReading(low, high);
+    uint16 adc_read = ADC_getReading(low, high);
+    return adc_read;
 }
 void ADC_setCallBack(func_ptr_t callback)
 {

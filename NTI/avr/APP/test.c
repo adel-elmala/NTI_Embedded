@@ -5,6 +5,7 @@
 #include "../MCAL/PWM/PWM_Interface.h"
 #include "../MCAL/ADC/ADC_Interface.h"
 
+#include "../HAL/L298_H_Bridge/L298_H_Bridge_Interface.h"
 void test_timer0()
 {
 
@@ -60,5 +61,29 @@ void test_adc()
         DIO_vWritePort(PORTD, ((result & 0xff00) >> 8));
         // DIO_vWritePort(PORTC, low);
         // DIO_vWritePort(PORTD, high);
+    }
+}
+
+L298_H_Bridge_Config_t dc_motor_configuration = {
+    ENABLE_MOTOR_A,
+    DISABLE_MOTOR_B,
+    MOTOR_A_DIRECTION_INPUT_PORT,
+    MOTOR_A_DIRECTION_INPUT_1_PIN,
+    MOTOR_A_DIRECTION_INPUT_2_PIN,
+    MOTOR_B_DIRECTION_INPUT_3_PIN,
+    MOTOR_B_DIRECTION_INPUT_4_PIN
+    //     // MOTOR_A_PWM_PORT,
+    //     // MOTOR_A_PWM_PIN,
+    //     // MOTOR_B_PWM_PORT,
+    //     // MOTOR_B_PWM_PIN
+};
+
+void test_motor()
+{
+    L298_H_Bridge_init(dc_motor_configuration);
+    L298_H_Bridge_Motor_A_Direction_Control(MOTOR_DIRECTION_FORWARD);
+    while (1)
+    {
+        L298_H_Bridge_Motor_A_Speed_Control(128, 20000);
     }
 }

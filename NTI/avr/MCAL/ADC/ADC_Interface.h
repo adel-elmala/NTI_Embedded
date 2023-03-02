@@ -21,6 +21,11 @@ typedef void (*func_ptr_t)(void);
 #define ADC_REFVOLTAGE_AVCC 1
 #define ADC_REFVOLTAGE_INTERNAL 3
 
+#define ADC_AVCC_VOLT_VALUE ((150) * 10) // (max tmp)* (10mv/1clesc)
+#define ADC_AREF_VOLT_VALUE ((150) * 10)
+#define ADC_INTERNAL_VOLT_VALUE 2560
+#define ADC_RESLUTION 1024
+
 // ADC Left Adjust Result MACROS
 #define ADC_LEFT_ADJUST 0
 #define ADC_RIGHT_ADJUST 1
@@ -94,9 +99,9 @@ typedef void (*func_ptr_t)(void);
 
 #define LOW 0
 #define HIGH 1
-void ADC_init();
+void ADC_init(ADC_Config_t conf);
 // uint16 ADC_getReading();
-uint16 ADC_PollRead();
+uint16 ADC_PollRead(uint8 *low, uint8 *high);
 
 void ADC_setCallBack(func_ptr_t callback);
 

@@ -89,3 +89,8 @@ void lcd_displayString(char *string)
         string++;
     }
 }
+
+void lcd_goto_line2()
+{
+    lcd_sendCommand(0xc0);
+}

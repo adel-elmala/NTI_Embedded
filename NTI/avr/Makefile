@@ -1,6 +1,7 @@
 SRC = 	main.c\
 		APP/application.c\
 		APP/calculator.c\
+		APP/smart_fan.c\
 		APP/test.c\
 		MCAL/DIO/dio.c\
 		MCAL/EXT_INT/External_INT.c\
@@ -9,14 +10,16 @@ SRC = 	main.c\
 		MCAL/ADC/ADC.c\
 		HAL/KeyPad/Keypad.c\
 		HAL/LCD/LCD.c\
+		HAL/L298_H_Bridge/L298_H_Bridge.c\
+		HAL/LM35/LM35.c\
 
 
 OBJ = $(subst .c,.o, $(SRC))
 
 MCU = atmega32
 FLASHER = usbasp
-# F_CPU = 8000000UL 
-F_CPU = 16000000UL 
+F_CPU = 8000000UL 
+# F_CPU = 16000000UL 
 BAUD  = 9600UL
 
 # CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU)  

@@ -45,6 +45,7 @@ Register – ADCL and ADCH
 */
 #define ADCH (*((volatile uint8 *)(0x25)))
 #define ADCL (*((volatile uint8 *)(0x24)))
+#define ADCDATA (*((volatile uint16 *)(0x24)))
 
 /*
 Special FunctionIO

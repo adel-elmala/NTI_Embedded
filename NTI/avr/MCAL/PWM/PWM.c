@@ -3,8 +3,8 @@
 #include "../../LIB/Calcbit.h"
 
 // #define FAST_PWM_MODE
-// #define CORRECT_PHASE_PWM_MODE
-// #define INVERTING_POLARITY
+#define CORRECT_PHASE_PWM_MODE
+#define INVERTING_POLARITY
 // #define NON_INVERTING_POLARITY
 // #define F_CPU 16000000UL
 void set_prescaler(uint16 prescaler);

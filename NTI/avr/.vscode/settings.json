@@ -4,6 +4,8 @@
     "datatypes.h": "c",
     "external_int_interface.h": "c",
     "timer.h": "c",
-    "pwm_interface.h": "c"
+    "pwm_interface.h": "c",
+    "adc_interface.h": "c",
+    "lm35_interface.h": "c"
   }
 }
