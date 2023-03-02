@@ -99,9 +99,18 @@ typedef void (*func_ptr_t)(void);
 
 #define LOW 0
 #define HIGH 1
+
+#define ADC_VECT __vector_16
+
+#define ISR(vector)                                  \
+    void vector(void) __attribute__((signal, used)); \
+    void vector(void)
+
 void ADC_init(ADC_Config_t conf);
 // uint16 ADC_getReading();
-uint16 ADC_PollRead(uint8 *low, uint8 *high);
+uint16 ADC_getReading(uint8 *low, uint8 *high);
+
+unsigned int ADC_PollRead(uint8 *low, uint8 *high);
 
 void ADC_setCallBack(func_ptr_t callback);
 

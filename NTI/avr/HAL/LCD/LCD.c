@@ -1,16 +1,18 @@
 #include "LCD_Interface.h"
 // #define F_CPU 16000000UL
 // #define F_CPU 8000000UL
-
-#include <util/delay.h>
+#include "../../MCAL/TIMER/timer.h"
+// #include <util/delay.h>
 void enablePulse(void)
 {
     DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_E, HIGH);
-    _delay_us(1);
+    // _delay_us(1);
+    TIMER0_Delay_us_with_Blocking(1);
     DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_E, LOW);
 }
 void lcd_init(void)
 {
+    TIMER0_SetConfig();
     // init ports
     DIO_vSetPinDirection(LCD_DATA_PORT, LCD_DATA_0, OUTPUT);
     DIO_vSetPinDirection(LCD_DATA_PORT, LCD_DATA_1, OUTPUT);
@@ -30,14 +32,16 @@ void lcd_init(void)
     lcd_sendCommand(0x28); // 2-lines , 5x7 matrix
     lcd_sendCommand(0x0e); // display on , cursor on
     lcd_sendCommand(0x01); // clear lcd
-    _delay_us(2000);
+    // _delay_us(2000);
+    TIMER0_Delay_us_with_Blocking(2000);
     lcd_sendCommand(0x06); // shift cursor right
 }
 void lcd_clearAndHome()
 {
     lcd_sendCommand(0x01); // clear lcd
     lcd_sendCommand(0x03); // clear lcd
-    _delay_us(2000);
+    // _delay_us(2000);
+    TIMER0_Delay_us_with_Blocking(2000);
 }
 void lcd_writeDataNibble(uint8 nibble)
 {
@@ -59,11 +63,13 @@ void lcd_sendCommand(uint8 commandCode)
     DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_RS, LCD_COMMAND_REG);
     // DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_RW, LCD_WRITE);// hardware ground
     enablePulse();
-    _delay_us(100);
+    // _delay_us(100);
+    TIMER0_Delay_us_with_Blocking(100);
 
     lcd_writeDataNibble(lowNibble);
     enablePulse();
-    _delay_us(100);
+    // _delay_us(100);
+    TIMER0_Delay_us_with_Blocking(100);
 }
 void lcd_sendData(uint8 data)
 {
@@ -74,11 +80,13 @@ void lcd_sendData(uint8 data)
     DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_RS, LCD_DATA_REG);
     // DIO_vWritePin(LCD_CONTROL_PORT, LCD_CONTROL_RW, LCD_WRITE); // hardware ground
     enablePulse();
-    _delay_us(100);
+    // _delay_us(100);
+    TIMER0_Delay_us_with_Blocking(100);
 
     lcd_writeDataNibble(lowNibble);
     enablePulse();
-    _delay_us(100);
+    // _delay_us(100);
+    TIMER0_Delay_us_with_Blocking(100);
 }
 
 void lcd_displayString(char *string)

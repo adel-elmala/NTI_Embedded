@@ -11,5 +11,7 @@
 #include "../../LIB/Datatypes.h"
 void LM35_vInit();
 unsigned int LM35_u16GetReading();
+unsigned int LM35_u16GetReading_NotBLocking();
+void get_adc_last_read(void);
 
 #endif

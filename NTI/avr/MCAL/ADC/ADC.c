@@ -1,5 +1,7 @@
 #include "ADC_Interface.h"
 #include "../../LIB/Calcbit.h"
+// #include <avr/interrupt.h>
+extern uint16 adc_last_result;
 static uint16 g_result_adjust;
 static double g_adc_step;
 func_ptr_t ADC_ISR_callback = NULL;
@@ -275,40 +277,20 @@ void ADC_init(ADC_Config_t conf)
     }
     // interrupt enable
     if (conf.enable_interrupt == ADC_ENABLE_INTR)
+    {
+        setbit(SREG, GIE);
         setbit(ADCSRA, ADCSRA_ADIE);
-
-    // {
-    //     ADC_DDRA = 0x0; /* Make ADC port as input */
-    //     ADCSRA = 0x87;  /* Enable ADC, fr/128  */
-    //     ADMUX = 0x40;   /* Vref: Avcc, ADC channel: 0 */
-    // }
+    }
 }
 uint16 ADC_getReading(uint8 *low, uint8 *high)
 {
     // ADC Start Conversion
     // ADSC -> ADCSRA
     uint16 result;
-    // uint16 tmp = 0;
-
     if (g_result_adjust == ADC_LEFT_ADJUST)
-    {
-        // result = (ADCL) >> 6;
-        // *low = ADCL;
-        // tmp = ADCH;
-        // *high = ADCH;
-        // result |= (tmp << 2);
         result = (ADCDATA) >> 6;
-    }
     else
-    {
-        // result = ADCL;
-        // *low = ADCL;
-        // tmp = ADCH;
-        // *high = ADCH;
-        // result |= (tmp << 8);
-
         result = ADCDATA;
-    }
     return result;
 }
 unsigned int ADC_PollRead(uint8 *low, uint8 *high)
@@ -328,9 +310,27 @@ void ADC_setCallBack(func_ptr_t callback)
         ADC_ISR_callback = callback;
 }
 
-void __vector_16(void) __attribute__((signal, used));
-void __vector_16(void)
+// void __vector_16(void) __attribute__((signal, used));
+// void __vector_16(void)
+// {
+//     // if (ADC_ISR_callback)
+//     // {
+//     // (*ADC_ISR_callback)();
+//     adc_last_result = ADC_getReading(NULL, NULL);
+
+//     setbit(*(volatile uint8 *)(0x3a), 7);
+//     togglebit(*(volatile uint8 *)(0x3b), 7);
+//     // ADC Start Conversion
+//     setbit(ADCSRA, ADCSRA_ADSC);
+//     // }
+// }
+
+ISR(ADC_VECT)
 {
-    if (ADC_ISR_callback)
-        (*ADC_ISR_callback)();
+    adc_last_result = ADC_getReading(NULL, NULL);
+
+    setbit(*(volatile uint8 *)(0x3a), 7);
+    togglebit(*(volatile uint8 *)(0x3b), 7);
+    // ADC Start Conversion
+    setbit(ADCSRA, ADCSRA_ADSC);
 }

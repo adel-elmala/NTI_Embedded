@@ -66,6 +66,9 @@ Register – SFIOR
 
 #define ADC_DDRA (*((volatile uint8 *)(0x3A)))
 
+#define SREG (*((volatile uint8 *)(0x5F)))
+#define GIE 7
+
 #define ADC_CHANNEL0 0
 #define ADC_CHANNEL1 1
 #define ADC_CHANNEL2 2
