@@ -18,7 +18,8 @@ OBJ = $(subst .c,.o, $(SRC))
 
 MCU = atmega32
 FLASHER = usbasp
-F_CPU = 8000000UL 
+F_CPU = 1000000UL 
+# F_CPU = 8000000UL 
 # F_CPU = 16000000UL 
 BAUD  = 9600UL
 

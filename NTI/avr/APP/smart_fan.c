@@ -50,13 +50,13 @@ unsigned int regulate_motor_speed(unsigned int current_temp)
     unsigned int fan_speed;
     if (current_temp < 25)
     {
-        L298_H_Bridge_Motor_A_Speed_Control(0, 500);
+        L298_H_Bridge_Motor_A_Speed_Control(0, 100);
         fan_speed = 0;
     }
     else if ((25 <= current_temp) && (current_temp < 30))
     {
         // L298_H_Bridge_Motor_A_Speed_Control(0.3 * 255, 5000);
-        L298_H_Bridge_Motor_A_Speed_Control(76, 500);
+        L298_H_Bridge_Motor_A_Speed_Control(76, 100);
         fan_speed = 30;
     }
 
@@ -64,13 +64,13 @@ unsigned int regulate_motor_speed(unsigned int current_temp)
     {
 
         // L298_H_Bridge_Motor_A_Speed_Control(0.5 * 255, 10000);
-        L298_H_Bridge_Motor_A_Speed_Control(128, 500);
+        L298_H_Bridge_Motor_A_Speed_Control(128, 100);
         fan_speed = 50;
     }
     else
     {
         // L298_H_Bridge_Motor_A_Speed_Control(0.8 * 255, 20000);
-        L298_H_Bridge_Motor_A_Speed_Control(205, 500);
+        L298_H_Bridge_Motor_A_Speed_Control(205, 100);
         fan_speed = 80;
     }
     return fan_speed;
