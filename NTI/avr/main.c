@@ -1,6 +1,6 @@
 // #include "APP/application.h"
-// #include "APP/test.h"
-#include "APP/smart_fan.h"
+#include "APP/test.h"
+// #include "APP/smart_fan.h"
 
 void main()
 {
@@ -10,5 +10,6 @@ void main()
     // test_pwm();
     // test_adc();
     // test_motor();
-    sf_app();
+    // sf_app();
+    test_uart();
 }

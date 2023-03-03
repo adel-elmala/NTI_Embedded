@@ -6,6 +6,8 @@
     "timer.h": "c",
     "pwm_interface.h": "c",
     "adc_interface.h": "c",
-    "lm35_interface.h": "c"
+    "lm35_interface.h": "c",
+    "uart_interface.h": "c",
+    "lcd_interface.h": "c"
   }
 }

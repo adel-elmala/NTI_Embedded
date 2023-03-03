@@ -28,6 +28,7 @@ unsigned int LM35_u16GetReading()
 
 unsigned int LM35_u16GetReading_NotBLocking()
 {
+    start_conversion();
     return (adc_last_result / 4);
 }
 void get_adc_last_read(void)

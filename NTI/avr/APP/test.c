@@ -4,8 +4,11 @@
 #include "../MCAL/DIO/DIO_REG.h"
 #include "../MCAL/PWM/PWM_Interface.h"
 #include "../MCAL/ADC/ADC_Interface.h"
+#include "../MCAL/UART/UART_Interface.h"
 
 #include "../HAL/L298_H_Bridge/L298_H_Bridge_Interface.h"
+#include "../HAL/LCD/LCD_Interface.h"
+
 void test_timer0()
 {
 
@@ -85,5 +88,33 @@ void test_motor()
     while (1)
     {
         L298_H_Bridge_Motor_A_Speed_Control(128, 20000);
+    }
+}
+
+UART_Config_t uart_conf = {9600,
+                           UART_DISABLE_DOUBLE_TRANSMISSION_SPEED,
+                           UART_DISABLE_MULTIPROCESSOR_COMMUNICATION_MODE,
+                           UART_DISABLE_RECEIVE_COMPLETE_INTERRUPT,
+                           UART_DISABLE_TRANSMIT_COMPLETE_INTERRUPT,
+                           UART_DISABLE_DATA_REG_EMPTY_COMPLETE_INTERRUPT,
+                           UART_ENABLE_RECEIVER,
+                           UART_ENABLE_TRANSMITER,
+                           UART_8BIT_CHAR_SIZE,
+                           UART_EVEN_PARITY,
+                           UART_1_BIT_STOP};
+void test_uart()
+{
+    UART_vInit(uart_conf);
+    // UART_vTransmitString("HI from uart");
+    lcd_init();
+
+    while (1)
+    {
+
+        uint8 d = UART_u16Receive_poll();
+        UART_vTransmit_poll(d);
+
+        lcd_sendData(d);
+        // UART_vTransmit_poll(d);
     }
 }

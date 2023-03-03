@@ -293,11 +293,16 @@ uint16 ADC_getReading(uint8 *low, uint8 *high)
         result = ADCDATA;
     return result;
 }
+void start_conversion()
+{
+    setbit(ADCSRA, ADCSRA_ADSC);
+}
 unsigned int ADC_PollRead(uint8 *low, uint8 *high)
 {
     // ADC Start Conversion
     // ADSC -> ADCSRA
-    setbit(ADCSRA, ADCSRA_ADSC);
+    start_conversion();
+
     while ((getbit(ADCSRA, ADCSRA_ADIF) == LOW)) // / conversion in progress
         ;
     setbit(ADCSRA, ADCSRA_ADIF); // clear flag

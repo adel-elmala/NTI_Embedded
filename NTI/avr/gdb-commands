@@ -1,8 +1,2 @@
-# Sensible asm plz
-set disassembly-flavor intel
-
-# Lie about screen size to prevent paging stops
-set height 0
-
 file ./bin/main.elf
 target remote localhost:1234

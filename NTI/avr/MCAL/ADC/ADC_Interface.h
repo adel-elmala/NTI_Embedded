@@ -113,5 +113,6 @@ uint16 ADC_getReading(uint8 *low, uint8 *high);
 unsigned int ADC_PollRead(uint8 *low, uint8 *high);
 
 void ADC_setCallBack(func_ptr_t callback);
+void start_conversion();
 
 #endif

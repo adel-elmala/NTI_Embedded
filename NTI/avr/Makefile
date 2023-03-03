@@ -8,6 +8,7 @@ SRC = 	main.c\
 		MCAL/TIMER/timer.c\
 		MCAL/PWM/PWM.c\
 		MCAL/ADC/ADC.c\
+		MCAL/UART/UART.c\
 		HAL/KeyPad/Keypad.c\
 		HAL/LCD/LCD.c\
 		HAL/L298_H_Bridge/L298_H_Bridge.c\
@@ -18,8 +19,8 @@ OBJ = $(subst .c,.o, $(SRC))
 
 MCU = atmega32
 FLASHER = usbasp
-F_CPU = 1000000UL 
-# F_CPU = 8000000UL 
+# F_CPU = 1000000UL 
+F_CPU = 8000000UL 
 # F_CPU = 16000000UL 
 BAUD  = 9600UL
 
