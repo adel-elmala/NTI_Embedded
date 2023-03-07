@@ -1,4 +1,5 @@
 SRC = 	main.c\
+		LIB/Queue/Queue.c\
 		APP/application.c\
 		APP/calculator.c\
 		APP/smart_fan.c\
@@ -20,8 +21,8 @@ OBJ = $(subst .c,.o, $(SRC))
 MCU = atmega32
 FLASHER = usbasp
 # F_CPU = 1000000UL 
-F_CPU = 8000000UL 
-# F_CPU = 16000000UL 
+# F_CPU = 8000000UL 
+F_CPU = 16000000UL 
 BAUD  = 9600UL
 
 # CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU)  

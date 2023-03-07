@@ -7,7 +7,9 @@
 USART I/O Data Register – UDR
 */
 #define UDR (*((volatile uint8 *)(0x2C)))
-
+#define UART_DDRD (*((volatile uint8 *)(0x31)))
+#define UART_DDRD_TXD 1
+#define UART_DDRD_RXD 0
 /*
 USART Control and
 Status Register A – UCSRA
@@ -43,6 +45,9 @@ Status Register B – UCSRB
 USART Control and
 Status Register C – UCSRC
 */
+#define SREG (*((volatile uint8 *)(0x5F)))
+#define SREG_GIE 7
+
 #define UCSRC (*((volatile uint8 *)(0x40)))
 
 #define UCSRC_URSEL 7
