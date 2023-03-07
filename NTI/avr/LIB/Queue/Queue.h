@@ -2,7 +2,7 @@
 #define QUEUE_H
 #include "../Datatypes.h"
 
-#define QUEUE_MAX_SIZE 256
+#define QUEUE_MAX_SIZE 20
 #define QUEUE_ERROR_EMPTY 14
 #define QUEUE_ERROR_FULL 15
 // #define QUEUE_MAX_SIZE 256

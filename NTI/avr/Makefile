@@ -4,12 +4,14 @@ SRC = 	main.c\
 		APP/calculator.c\
 		APP/smart_fan.c\
 		APP/test.c\
+		MCAL/GIE/GIE.c\
 		MCAL/DIO/dio.c\
 		MCAL/EXT_INT/External_INT.c\
 		MCAL/TIMER/timer.c\
 		MCAL/PWM/PWM.c\
 		MCAL/ADC/ADC.c\
 		MCAL/UART/UART.c\
+		MCAL/SPI/SPI.c\
 		HAL/KeyPad/Keypad.c\
 		HAL/LCD/LCD.c\
 		HAL/L298_H_Bridge/L298_H_Bridge.c\

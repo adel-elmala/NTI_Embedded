@@ -6,8 +6,8 @@
 uint8 char_bit_size;
 uint8 UCSRC_temp;
 
-Queue_Circular_t data_to_be_transmitted_q = {0};
-Queue_Circular_t data_received_q = {0};
+static Queue_Circular_t data_to_be_transmitted_q = {0};
+static Queue_Circular_t data_received_q = {0};
 
 void UART_vInit(UART_Config_t conf)
 {

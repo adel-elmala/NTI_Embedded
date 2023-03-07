@@ -16,7 +16,7 @@
 #define LCD_DATA_0 PIN0
 #define LCD_DATA_1 PIN1
 #define LCD_DATA_2 PIN2
-#define LCD_DATA_3 PIN4
+#define LCD_DATA_3 PIN3
 
 // #define LCD_DATA_4 PIN4
 // #define LCD_DATA_5 PIN5

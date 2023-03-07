@@ -1,17 +1,160 @@
 #include "SPI_REG.h"
-void SPI_MasterInit(void)
+#include "SPI_Interface.h"
+#include "../../LIB/Calcbit.h"
+#include "../GIE/GIE_Interface.h"
+#include "../../LIB/Queue/Queue.h"
+
+static Queue_Circular_t data_to_transmit_q = {0};
+static Queue_Circular_t data_received_q = {0};
+
+void SPI_Init(SPI_Config_t *conf)
 {
-    /* Set MOSI and SCK output, all others input */
-    SPI_DDR = (1 << SPI_DDR_MOSI) | (1 << SPI_DDR_SCK);
-    /* Enable SPI, Master, set clock rate fck/16 */
-    SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
+    uint8 SPCR_copy = 0;
+
+    if (conf->is_master)
+    {
+        /* Set MOSI , SS , and SCK output */
+
+        // SPI_DDR = ((1 << SPI_DDR_MOSI) | (1 << SPI_DDR_SCK) | (1 << SPI_DDR_SS));
+        // SPI_DDR |= ((1 << SPI_MOSI) | (1 << SPI_SCK) | (1 << SPI_SS));
+        SPI_DDR |= ((1 << SPI_MOSI) | (1 << SPI_SCK));
+        SPI_DDR &= ~(1 << SPI_MISO);
+        SPI_PORT |= (1 << SPI_SS); // ss-pulled_up
+        setbit(SPCR_copy, MSTR);
+    }
+    else
+    {
+        /* Set MISO output */
+        SPI_DDR |= (1 << SPI_MISO);
+        SPI_DDR &= ~((1 << SPI_MOSI) | (1 << SPI_SCK) | (1 << SPI_SS));
+    }
+    // /* Enable SPI, Master, set clock rate fck/16 */
+    // SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
+    if (conf->enable_interrupt)
+    {
+        _sei();
+        setbit(SPCR_copy, SPIE);
+    }
+    if (conf->enable_spi)
+        setbit(SPCR_copy, SPE);
+    if (conf->data_order == DORD_LSB_FIRST)
+        setbit(SPCR_copy, DORD);
+    // if (conf->is_master)
+    //     setbit(SPCR_copy, MSTR);
+    if (conf->clk_polarity == CLK_HIGH_IDLE)
+        setbit(SPCR_copy, CPOL);
+    if (conf->clk_phase == SETUP_ON_FIRST)
+        setbit(SPCR_copy, CPHA);
+    SPCR_copy |= (conf->clk_divisor & 0x03);
+    if (conf->double_speed)
+        setbit(SPSR, SPI2X);
+
+    SPCR = SPCR_copy;
 }
-void SPI_SlaveInit(void)
+
+uint8 SPI_Transieve_Sync(uint8 data)
 {
-    /* Set MISO output, all others input */
-    SPI_DDR = (1 << SPI_DDR_MISO);
-    /* Enable SPI */
-    SPCR = (1 << SPE);
+    uint8 flush;
+    // SPI_PORT &= ~(1 << SPI_SS);
+    // clearbit(SPI_PORT, SPI_SS);
+    SPDR = data;
+    while (!(SPSR & (1 << SPIF)))
+        ; // wait till transmission completes
+    // setbit(SPI_PORT, SPI_SS);
+
+    flush = SPDR;
+    return flush;
+}
+void SPI_Master_send_Sync(uint8 data)
+{
+    volatile uint8 flush;
+    // SPI_PORT &= ~(1 << SPI_SS);
+    // clearbit(SPI_PORT, SPI_SS);
+    SPDR = data;
+    while (!(SPSR & (1 << SPIF)))
+        ; // wait till transmission completes
+    // setbit(SPI_PORT, SPI_SS);
+
+    flush = SPDR;
+}
+uint8 SPI_Master_receive_Sync(void)
+{
+    uint8 flush;
+    uint8 dummy = 0xff;
+    // SPI_PORT &= ~(1 << SPI_SS);
+    // clearbit(SPI_PORT, SPI_SS);
+    SPDR = dummy;
+    // while (!(SPSR & (1 << SPIF)))
+    while (getbit(SPSR, SPIF) == 0)
+        ; // wait till transmission completes
+    flush = SPDR;
+    // setbit(SPI_PORT, SPI_SS);
+
+    return flush;
+}
+void SPI_slave_send_Sync(uint8 data)
+{
+    volatile uint8 flush;
+    SPDR = data;
+    while (!(SPSR & (1 << SPIF)))
+        ; // wait till transmission completes
+
+    flush = SPDR;
+}
+uint8 SPI_slave_receive_Sync(void)
+{
+    uint8 flush;
+    uint8 dummy = 0xff;
+    SPDR = dummy;
+    while (!(SPSR & (1 << SPIF)))
+        ; // wait till transmission completes
+    flush = SPDR;
+
+    return flush;
+}
+bool SPI_Transmit_Async(uint8 data)
+{
+    if (q_isFull(&data_to_transmit_q))
+        return false; // can't sent or recevied data
+    else
+    {
+
+        // try to transmit now
+        if (getbit(SPSR, SPIF) == 1)
+        {
+            // clearbit(SPI_PORT, SPI_SS);
+
+            SPDR = data; // droping received data
+
+            // setbit(SPI_PORT, SPI_SS);
+        }
+        else
+            q_enqueue(&data_to_transmit_q, data);
+        return true;
+    }
+}
+
+uint8 SPI_Receive_Async(void)
+{
+    if (q_isEmpty(&data_received_q))
+        return QUEUE_ERROR_EMPTY;
+    else
+        return q_dequeue(&data_received_q);
+}
+
+void __vector_12(void) __attribute__((signal, used)); // SPI, Serial Transfer Complete
+void __vector_12(void)
+{
+    if (q_isEmpty(&data_to_transmit_q))
+        return;
+    else
+    {
+        q_enqueue(&data_received_q, SPDR); // buffer recieved data
+
+        // clearbit(SPI_PORT, SPI_SS);
+        SPDR = q_dequeue(&data_to_transmit_q);
+        // setbit(SPI_PORT, SPI_SS);
+    }
 }
 
 void SPI_MasterTransmit(char cData)

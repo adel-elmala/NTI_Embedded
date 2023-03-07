@@ -27,11 +27,11 @@ SPI Status Register – SPSR
 SPI Data Register – SPDR
 */
 #define SPDR (*((volatile uint8 *)(0x2F)))
-
+#define SPI_PORT (*((volatile uint8 *)(0x38)))
 #define SPI_DDR (*((volatile uint8 *)(0x37)))
-#define SPI_DDR_SS 4
-#define SPI_DDR_MOSI 5
-#define SPI_DDR_MISO 6
-#define SPI_DDR_SCK 7
+#define SPI_SS 4
+#define SPI_MOSI 5
+#define SPI_MISO 6
+#define SPI_SCK 7
 
 #endif
