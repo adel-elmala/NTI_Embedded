@@ -102,3 +102,7 @@ void lcd_goto_line2()
 {
     lcd_sendCommand(0xc0);
 }
+void lcd_goto(uint8 line, uint8 col)
+{
+    lcd_sendCommand(line + (col - 1));
+}

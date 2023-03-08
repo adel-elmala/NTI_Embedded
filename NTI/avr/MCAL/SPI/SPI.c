@@ -6,6 +6,7 @@
 
 static Queue_Circular_t data_to_transmit_q = {0};
 static Queue_Circular_t data_received_q = {0};
+static bool g_is_master = false;
 
 void SPI_Init(SPI_Config_t *conf)
 {
@@ -14,25 +15,34 @@ void SPI_Init(SPI_Config_t *conf)
     if (conf->is_master)
     {
         /* Set MOSI , SS , and SCK output */
+        setbit(SPI_DDR, SPI_MOSI);
+        setbit(SPI_DDR, SPI_SCK);
+        setbit(SPI_DDR, SPI_SS);
+        setbit(SPI_PORT, SPI_SS); // initially high
 
-        // SPI_DDR = ((1 << SPI_DDR_MOSI) | (1 << SPI_DDR_SCK) | (1 << SPI_DDR_SS));
-        // SPI_DDR |= ((1 << SPI_MOSI) | (1 << SPI_SCK) | (1 << SPI_SS));
-        SPI_DDR |= ((1 << SPI_MOSI) | (1 << SPI_SCK));
-        SPI_DDR &= ~(1 << SPI_MISO);
-        SPI_PORT |= (1 << SPI_SS); // ss-pulled_up
+        /* Set MISO as input */
+        clearbit(SPI_DDR, SPI_MISO);
+        /* set as master*/
         setbit(SPCR_copy, MSTR);
+        g_is_master = true;
     }
     else
     {
-        /* Set MISO output */
-        SPI_DDR |= (1 << SPI_MISO);
-        SPI_DDR &= ~((1 << SPI_MOSI) | (1 << SPI_SCK) | (1 << SPI_SS));
+
+        /* Set MOSI , SS , and SCK input */
+        clearbit(SPI_DDR, SPI_MOSI);
+        clearbit(SPI_DDR, SPI_SCK);
+        clearbit(SPI_DDR, SPI_SS);
+
+        /* Set MISO as output */
+        setbit(SPI_DDR, SPI_MISO);
+        g_is_master = false;
     }
     // /* Enable SPI, Master, set clock rate fck/16 */
     // SPCR = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
     if (conf->enable_interrupt)
     {
-        _sei();
+        sei();
         setbit(SPCR_copy, SPIE);
     }
     if (conf->enable_spi)
@@ -55,12 +65,18 @@ void SPI_Init(SPI_Config_t *conf)
 uint8 SPI_Transieve_Sync(uint8 data)
 {
     uint8 flush;
+
     // SPI_PORT &= ~(1 << SPI_SS);
-    // clearbit(SPI_PORT, SPI_SS);
+    if (g_is_master)
+        clearbit(SPI_PORT, SPI_SS);
+
     SPDR = data;
-    while (!(SPSR & (1 << SPIF)))
+    // while (!(SPSR & (1 << SPIF)))
+    while (getbit(SPSR, SPIF) == 0)
         ; // wait till transmission completes
-    // setbit(SPI_PORT, SPI_SS);
+
+    if (g_is_master)
+        setbit(SPI_PORT, SPI_SS);
 
     flush = SPDR;
     return flush;

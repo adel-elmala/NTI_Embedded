@@ -11,6 +11,8 @@
 #include "../HAL/LCD/LCD_Interface.h"
 
 #include "../LIB/Queue/Queue.h"
+
+#include <stdio.h>
 void test_timer0()
 {
 
@@ -133,78 +135,66 @@ void test_uart()
 }
 
 SPI_Config_t master_spi_conf = {
-    true,            // bool enable_interrupt;
-    true,            // bool enable_spi;
-    true,            // bool is_master;
-    false,           // bool double_speed;
-    CLK_LOW_IDLE,    // uint8 clk_polarity;
-    SAMPLE_ON_FIRST, // uint8 clk_phase;
-    CLK_DIV_16,      // uint8 clk_divisor;
-    DORD_LSB_FIRST   // uint8 data_order;
+    false,          // bool enable_interrupt;
+    true,           // bool enable_spi;
+    true,           // bool is_master;
+    false,          // bool double_speed;
+    CLK_HIGH_IDLE,  // uint8 clk_polarity;
+    SETUP_ON_FIRST, // uint8 clk_phase;
+    CLK_DIV_128,    // uint8 clk_divisor;
+    DORD_LSB_FIRST  // uint8 data_order;
 };
 SPI_Config_t slave_spi_conf = {
-    false,           // bool enable_interrupt;
-    true,            // bool enable_spi;
-    false,           // bool is_master;
-    false,           // bool double_speed;
-    CLK_LOW_IDLE,    // uint8 clk_polarity;
-    SAMPLE_ON_FIRST, // uint8 clk_phase;
-    CLK_DIV_16,      // uint8 clk_divisor;
-    DORD_LSB_FIRST   // uint8 data_order;
+    false,          // bool enable_interrupt;
+    true,           // bool enable_spi;
+    false,          // bool is_master;
+    false,          // bool double_speed;
+    CLK_HIGH_IDLE,  // uint8 clk_polarity;
+    SETUP_ON_FIRST, // uint8 clk_phase;
+    CLK_DIV_128,    // uint8 clk_divisor;
+    DORD_LSB_FIRST  // uint8 data_order;
 };
 void test_spi_master()
 {
     lcd_init();
-    SPI_Init(&master_spi_conf);
-    // char str[] = "adel,using spi as a master!";
-    // uint8 counter = 0;
-    uint8 data;
-    // TIMER0_Delay_ms_with_Blocking(100);
+    lcd_displayString("Master SPI:");
+    lcd_goto_line2();
+    lcd_displayString("Mstr Snt: ");
+    lcd_goto(LCD_LINE_2, LCD_COL_10);
 
-    // SPI_Transmit_Async('a');
-    // SPI_Transmit_Async('a');
-    // SPI_Transmit_Async('d');
-    // SPI_Transmit_Async('e');
-    // SPI_Transmit_Async('l');
-    // SPI_Transmit_Async('!');
-    // data = SPI_Receive_Async();
-    // lcd_sendData(data);
-    // data = SPI_Receive_Async();
-    // lcd_sendData(data);
-    // data = SPI_Receive_Async();
-    // lcd_sendData(data);
-    // data = SPI_Receive_Async();
-    // lcd_sendData(data);
+    SPI_Init(&master_spi_conf);
+    char str[4];
+    uint8 counter = 0;
+    uint8 data;
 
     while (1)
     {
-        // SPI_Master_send_Sync('b');
-        // data = SPI_Master_receive_Sync();
-        SPI_Transmit_Async('a');
-        SPI_Transmit_Async('b');
-        data = SPI_Receive_Async();
-        lcd_sendData(data);
+        SPI_Transieve_Sync(counter);
+        sprintf(str, "%d", counter++);
+        lcd_goto(LCD_LINE_2, LCD_COL_10);
 
-        // uint8 rec = SPI_Transieve_Sync(str[counter]);
-        // if ((++counter) > 28)
-        //     counter = 0;
-        // lcd_sendData(rec);
+        lcd_displayString(str);
+        TIMER0_Delay_ms_with_Blocking(1000);
     }
 }
 
 void test_spi_slave()
 {
+    lcd_init();
+    lcd_displayString("Slave SPI:");
+    lcd_goto_line2();
+    lcd_displayString("Slv Rcved: ");
+    lcd_goto(LCD_LINE_2, LCD_COL_11);
+
     SPI_Init(&slave_spi_conf);
-    // char str[] = "adel,using spi as a master!";
+    char str[4];
     // uint8 counter = 0;
     while (1)
     {
-        // SPI_slave_send_Sync('a');
+        uint8 data = SPI_Transieve_Sync(0xff);
+        sprintf(str, "%d", data);
 
-        // uint8 rec = SPI_Transieve_Sync(str[counter]);
-        // if ((++counter) > 28)
-        //     counter = 0;
-        // lcd_sendData(rec);
-        /* code */
+        lcd_goto(LCD_LINE_2, LCD_COL_11);
+        lcd_displayString(str);
     }
 }

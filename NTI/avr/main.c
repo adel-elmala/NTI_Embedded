@@ -12,6 +12,6 @@ void main()
     // test_motor();
     // sf_app();
     // test_uart();
-    // test_spi_master();
-    test_spi_slave();
+    test_spi_master();
+    // test_spi_slave();
 }
