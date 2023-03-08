@@ -13,6 +13,7 @@
 #include "../LIB/Queue/Queue.h"
 
 #include <stdio.h>
+bool g_trans_comp = false;
 void test_timer0()
 {
 
@@ -135,7 +136,7 @@ void test_uart()
 }
 
 SPI_Config_t master_spi_conf = {
-    false,          // bool enable_interrupt;
+    true,           // bool enable_interrupt;
     true,           // bool enable_spi;
     true,           // bool is_master;
     false,          // bool double_speed;
@@ -145,7 +146,7 @@ SPI_Config_t master_spi_conf = {
     DORD_LSB_FIRST  // uint8 data_order;
 };
 SPI_Config_t slave_spi_conf = {
-    false,          // bool enable_interrupt;
+    true,           // bool enable_interrupt;
     true,           // bool enable_spi;
     false,          // bool is_master;
     false,          // bool double_speed;
@@ -154,6 +155,10 @@ SPI_Config_t slave_spi_conf = {
     CLK_DIV_128,    // uint8 clk_divisor;
     DORD_LSB_FIRST  // uint8 data_order;
 };
+void trans_comp(void)
+{
+    g_trans_comp = true;
+}
 void test_spi_master()
 {
     lcd_init();
@@ -163,38 +168,57 @@ void test_spi_master()
     lcd_goto(LCD_LINE_2, LCD_COL_10);
 
     SPI_Init(&master_spi_conf);
-    char str[4];
-    uint8 counter = 0;
-    uint8 data;
+    // char str[4];
+    // uint8 counter = 0;
+    // uint8 data;
+    // SPI_Transmit_Buffer_Async("hi from master!", 16, trans_comp);
 
     while (1)
     {
-        SPI_Transieve_Sync(counter);
-        sprintf(str, "%d", counter++);
-        lcd_goto(LCD_LINE_2, LCD_COL_10);
+        // uint8 data = SPI_Transieve_Sync('A' + counter);
+        // bool status = SPI_Transmit_Async('A' + counter);
+        // if (status == false)
+        // {
+        //     lcd_displayString("trans buff ovrflw");
+        //     continue;
+        // }
+        SPI_Transmit_Buffer_Async("hi from master!", 16, trans_comp);
+        uint8 data = SPI_Receive_Async();
 
-        lcd_displayString(str);
-        TIMER0_Delay_ms_with_Blocking(1000);
+        // sprintf(str, "%d", counter++);
+        // lcd_goto(LCD_LINE_2, LCD_COL_10);
+
+        if (data != QUEUE_ERROR_EMPTY)
+            lcd_sendData(data);
+        // lcd_sendData(data);
+        // TIMER0_Delay_ms_with_Blocking(1000);
+        // counter++;
     }
 }
 
 void test_spi_slave()
 {
     lcd_init();
-    lcd_displayString("Slave SPI:");
-    lcd_goto_line2();
+    // lcd_displayString("Slave SPI:");
     lcd_displayString("Slv Rcved: ");
-    lcd_goto(LCD_LINE_2, LCD_COL_11);
+    // lcd_goto_line2();
+    // lcd_goto(LCD_LINE_2, LCD_COL_11);
+    lcd_goto(LCD_LINE_2, LCD_COL_1);
 
     SPI_Init(&slave_spi_conf);
-    char str[4];
-    // uint8 counter = 0;
+    // char str[4];
+    uint8 counter = 0;
     while (1)
     {
-        uint8 data = SPI_Transieve_Sync(0xff);
-        sprintf(str, "%d", data);
+        // uint8 data = SPI_Transieve_Sync('z' - counter);
+        // SPI_Transmit_Async('z' - counter);
+        SPI_Transmit_Buffer_Async("Bonjour from slave!", 20, NULL);
+        uint8 data = SPI_Receive_Async();
+        // sprintf(str, "%d", data);
 
-        lcd_goto(LCD_LINE_2, LCD_COL_11);
-        lcd_displayString(str);
+        // lcd_displayString(str);
+        if (data != QUEUE_ERROR_EMPTY)
+            lcd_sendData(data);
+        counter++;
     }
 }

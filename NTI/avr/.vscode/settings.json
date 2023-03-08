@@ -9,6 +9,7 @@
     "lm35_interface.h": "c",
     "uart_interface.h": "c",
     "lcd_interface.h": "c",
-    "dio_reg.h": "c"
+    "dio_reg.h": "c",
+    "test.h": "c"
   }
 }

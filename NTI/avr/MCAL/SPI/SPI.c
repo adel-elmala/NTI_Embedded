@@ -3,13 +3,19 @@
 #include "../../LIB/Calcbit.h"
 #include "../GIE/GIE_Interface.h"
 #include "../../LIB/Queue/Queue.h"
+#include "../DIO/DIO_Interface.h"
+#include "../DIO/DIO_REG.h"
 
 static Queue_Circular_t data_to_transmit_q = {0};
 static Queue_Circular_t data_received_q = {0};
 static bool g_is_master = false;
+void (*trans_complete_callback)(void) = NULL;
+void (*recv_complete_callback)(void) = NULL;
 
 void SPI_Init(SPI_Config_t *conf)
 {
+    q_init(&data_to_transmit_q);
+    q_init(&data_received_q);
     uint8 SPCR_copy = 0;
 
     if (conf->is_master)
@@ -81,53 +87,7 @@ uint8 SPI_Transieve_Sync(uint8 data)
     flush = SPDR;
     return flush;
 }
-void SPI_Master_send_Sync(uint8 data)
-{
-    volatile uint8 flush;
-    // SPI_PORT &= ~(1 << SPI_SS);
-    // clearbit(SPI_PORT, SPI_SS);
-    SPDR = data;
-    while (!(SPSR & (1 << SPIF)))
-        ; // wait till transmission completes
-    // setbit(SPI_PORT, SPI_SS);
 
-    flush = SPDR;
-}
-uint8 SPI_Master_receive_Sync(void)
-{
-    uint8 flush;
-    uint8 dummy = 0xff;
-    // SPI_PORT &= ~(1 << SPI_SS);
-    // clearbit(SPI_PORT, SPI_SS);
-    SPDR = dummy;
-    // while (!(SPSR & (1 << SPIF)))
-    while (getbit(SPSR, SPIF) == 0)
-        ; // wait till transmission completes
-    flush = SPDR;
-    // setbit(SPI_PORT, SPI_SS);
-
-    return flush;
-}
-void SPI_slave_send_Sync(uint8 data)
-{
-    volatile uint8 flush;
-    SPDR = data;
-    while (!(SPSR & (1 << SPIF)))
-        ; // wait till transmission completes
-
-    flush = SPDR;
-}
-uint8 SPI_slave_receive_Sync(void)
-{
-    uint8 flush;
-    uint8 dummy = 0xff;
-    SPDR = dummy;
-    while (!(SPSR & (1 << SPIF)))
-        ; // wait till transmission completes
-    flush = SPDR;
-
-    return flush;
-}
 bool SPI_Transmit_Async(uint8 data)
 {
     if (q_isFull(&data_to_transmit_q))
@@ -136,13 +96,17 @@ bool SPI_Transmit_Async(uint8 data)
     {
 
         // try to transmit now
-        if (getbit(SPSR, SPIF) == 1)
+        // if (getbit(SPSR, SPIF) == 1)
+        if (q_isEmpty(&data_to_transmit_q))
         {
-            // clearbit(SPI_PORT, SPI_SS);
+            // if (g_is_master)
+            //     clearbit(SPI_PORT, SPI_SS);
 
-            SPDR = data; // droping received data
+            q_enqueue(&data_to_transmit_q, data);
+            SPDR = 0xff; // dummy value to trigger SPIF flag
 
-            // setbit(SPI_PORT, SPI_SS);
+            if (g_is_master)
+                setbit(SPI_PORT, SPI_SS); // this gets the slave to ignore the dummy send
         }
         else
             q_enqueue(&data_to_transmit_q, data);
@@ -157,36 +121,44 @@ uint8 SPI_Receive_Async(void)
     else
         return q_dequeue(&data_received_q);
 }
-
+void SPI_Transmit_Buffer_Async(uint8 *buff, uint16 buff_size, void (*f_ptr)(void))
+{
+    for (uint16 i = 0; i < buff_size; ++i)
+    {
+        SPI_Transmit_Async(buff[i]);
+    }
+    trans_complete_callback = f_ptr;
+}
+// void SPI_Receive_Buffer_Async(uint8 *buff, uint16 buff_size, void (*f_ptr)(void))
+// {
+//     for (uint16 i = 0; i < buff_size; ++i)
+//     {
+//         SPI_Transmit_Async(buff[i]);
+//     }
+//     recv_complete_callback = f_ptr;
+// }
 void __vector_12(void) __attribute__((signal, used)); // SPI, Serial Transfer Complete
 void __vector_12(void)
 {
+    // DIO_vSetPinDirection(PORTC, PIN7, OUTPUT);
+    // // DIO_vWritePin(PORTC, PIN7, HIGH);
+    // DIO_vTogglePin(PORTC, PIN7);
+    q_enqueue(&data_received_q, SPDR); // buffer recieved data
     if (q_isEmpty(&data_to_transmit_q))
+    {
+        if (trans_complete_callback)
+            (*trans_complete_callback)();
         return;
+    }
     else
     {
-        q_enqueue(&data_received_q, SPDR); // buffer recieved data
+        // q_enqueue(&data_received_q, SPDR); // buffer recieved data
+        if (g_is_master)
+            clearbit(SPI_PORT, SPI_SS);
 
-        // clearbit(SPI_PORT, SPI_SS);
         SPDR = q_dequeue(&data_to_transmit_q);
-        // setbit(SPI_PORT, SPI_SS);
+
+        // if (g_is_master)
+        //     setbit(SPI_PORT, SPI_SS);
     }
-}
-
-void SPI_MasterTransmit(char cData)
-{
-    /* Start transmission */
-    SPDR = cData;
-    /* Wait for transmission complete */
-    while (!(SPSR & (1 << SPIF)))
-        ;
-}
-
-char SPI_SlaveReceive(void)
-{
-    /* Wait for reception complete */
-    while (!(SPSR & (1 << SPIF)))
-        ;
-    /* Return data register */
-    return SPDR;
 }

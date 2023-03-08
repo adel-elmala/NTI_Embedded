@@ -32,13 +32,8 @@ typedef struct SPI_Config
 void SPI_Init(SPI_Config_t *conf);
 uint8 SPI_Transieve_Sync(uint8 data);
 
-void SPI_Master_send_Sync(uint8 data);
-uint8 SPI_Master_receive_Sync(void);
-
-void SPI_slave_send_Sync(uint8 data);
-uint8 SPI_slave_receive_Sync(void);
-
 bool SPI_Transmit_Async(uint8 data);
 uint8 SPI_Receive_Async(void);
+void SPI_Transmit_Buffer_Async(uint8 *buff, uint16 buff_size, void (*f_ptr)(void));
 
 #endif
