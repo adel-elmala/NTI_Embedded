@@ -8,5 +8,7 @@ void test_motor();
 void test_uart();
 void test_spi_master();
 void test_spi_slave();
+void test_twi_mt_poll();
+void test_twi_sr_poll();
 
 #endif

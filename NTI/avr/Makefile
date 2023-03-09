@@ -3,6 +3,8 @@ SRC = 	main.c\
 		APP/application.c\
 		APP/calculator.c\
 		APP/smart_fan.c\
+		APP/com_project_master.c\
+		APP/com_project_slave.c\
 		APP/test.c\
 		MCAL/GIE/GIE.c\
 		MCAL/DIO/dio.c\
@@ -12,6 +14,7 @@ SRC = 	main.c\
 		MCAL/ADC/ADC.c\
 		MCAL/UART/UART.c\
 		MCAL/SPI/SPI.c\
+		MCAL/TWI/TWI.c\
 		HAL/KeyPad/Keypad.c\
 		HAL/LCD/LCD.c\
 		HAL/L298_H_Bridge/L298_H_Bridge.c\

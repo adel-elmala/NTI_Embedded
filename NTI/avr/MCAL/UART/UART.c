@@ -212,12 +212,12 @@ uint16 UART_u16Receive_poll()
     // return UDR;
 }
 
-void UART_Flush(void)
-{
-    volatile unsigned char dummy;
-    while (UCSRA & (1 << UCSRA_RXC))
-        dummy = UDR;
-}
+// void UART_Flush(void)
+// {
+//     volatile unsigned char dummy;
+//     while (UCSRA & (1 << UCSRA_RXC))
+//         dummy = UDR;
+// }
 void UART_vTransmitString(char *str)
 {
     while (*str)

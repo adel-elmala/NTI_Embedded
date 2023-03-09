@@ -6,6 +6,7 @@
 #include "../MCAL/ADC/ADC_Interface.h"
 #include "../MCAL/UART/UART_Interface.h"
 #include "../MCAL/SPI/SPI_Interface.h"
+#include "../MCAL/TWI/TWI_Interface.h"
 
 #include "../HAL/L298_H_Bridge/L298_H_Bridge_Interface.h"
 #include "../HAL/LCD/LCD_Interface.h"
@@ -136,7 +137,7 @@ void test_uart()
 }
 
 SPI_Config_t master_spi_conf = {
-    true,           // bool enable_interrupt;
+    false,          // bool enable_interrupt;
     true,           // bool enable_spi;
     true,           // bool is_master;
     false,          // bool double_speed;
@@ -146,7 +147,7 @@ SPI_Config_t master_spi_conf = {
     DORD_LSB_FIRST  // uint8 data_order;
 };
 SPI_Config_t slave_spi_conf = {
-    true,           // bool enable_interrupt;
+    false,          // bool enable_interrupt;
     true,           // bool enable_spi;
     false,          // bool is_master;
     false,          // bool double_speed;
@@ -168,13 +169,18 @@ void test_spi_master()
     lcd_goto(LCD_LINE_2, LCD_COL_10);
 
     SPI_Init(&master_spi_conf);
-    // char str[4];
+    char str[] = "from master";
     // uint8 counter = 0;
     // uint8 data;
     // SPI_Transmit_Buffer_Async("hi from master!", 16, trans_comp);
-
+    for (int i = 0; i < 12; ++i)
+    {
+        uint8 data = SPI_Transieve_Sync(str[i]);
+        lcd_sendData(data);
+    }
     while (1)
     {
+
         // uint8 data = SPI_Transieve_Sync('A' + counter);
         // bool status = SPI_Transmit_Async('A' + counter);
         // if (status == false)
@@ -182,14 +188,14 @@ void test_spi_master()
         //     lcd_displayString("trans buff ovrflw");
         //     continue;
         // }
-        SPI_Transmit_Buffer_Async("hi from master!", 16, trans_comp);
-        uint8 data = SPI_Receive_Async();
+        // SPI_Transmit_Buffer_Async("hi from master!", 16, trans_comp);
+        // uint8 data = SPI_Receive_Async();
 
         // sprintf(str, "%d", counter++);
         // lcd_goto(LCD_LINE_2, LCD_COL_10);
 
-        if (data != QUEUE_ERROR_EMPTY)
-            lcd_sendData(data);
+        // if (data != QUEUE_ERROR_EMPTY)
+        //     lcd_sendData(data);
         // lcd_sendData(data);
         // TIMER0_Delay_ms_with_Blocking(1000);
         // counter++;
@@ -206,19 +212,67 @@ void test_spi_slave()
     lcd_goto(LCD_LINE_2, LCD_COL_1);
 
     SPI_Init(&slave_spi_conf);
-    // char str[4];
-    uint8 counter = 0;
+    char str[] = "from slave!";
+    // uint8 counter = 0;
+    for (int i = 0; i < 12; ++i)
+    {
+        uint8 data = SPI_Transieve_Sync(str[i]);
+        lcd_sendData(data);
+    }
     while (1)
     {
         // uint8 data = SPI_Transieve_Sync('z' - counter);
         // SPI_Transmit_Async('z' - counter);
-        SPI_Transmit_Buffer_Async("Bonjour from slave!", 20, NULL);
-        uint8 data = SPI_Receive_Async();
-        // sprintf(str, "%d", data);
+        // SPI_Transmit_Buffer_Async("Bonjour from slave!", 20, NULL);
+        // uint8 data = SPI_Receive_Async();
+        // // sprintf(str, "%d", data);
 
-        // lcd_displayString(str);
-        if (data != QUEUE_ERROR_EMPTY)
-            lcd_sendData(data);
-        counter++;
+        // // lcd_displayString(str);
+        // if (data != QUEUE_ERROR_EMPTY)
+        //     lcd_sendData(data);
+        // counter++;
     }
+}
+// typedef struct TWI_Config
+TWI_Config_t twi_conf_mt = {
+
+    400000,          //     uint32 scl_freq;     // shouldn't exceed twi_max_scl supported
+    TWI_prescaler_4, //     uint8 scl_prescaler; // shouldn't exceed twi_max_scl supported
+    true,            //     bool enable_ack;
+    true,            //     bool enable_twi;
+    false,           //     bool enable_interrupt;
+    0x11,            //     uint8 own_slave_address;
+    false            //     bool enable_general_call;
+};
+TWI_Config_t twi_conf_sr = {
+
+    400000,          //     uint32 scl_freq;     // shouldn't exceed twi_max_scl supported
+    TWI_prescaler_4, //     uint8 scl_prescaler; // shouldn't exceed twi_max_scl supported
+    true,            //     bool enable_ack;
+    true,            //     bool enable_twi;
+    false,           //     bool enable_interrupt;
+    0x22,            //     uint8 own_slave_address;
+    false            //     bool enable_general_call;
+};
+void test_twi_mt_poll()
+{
+
+    TWI_Init(twi_conf_mt);
+
+    // TWI_Master_Transmit_Buffer("abcdef", 7, 0x10);
+    TWI_Master_Transmit_Byte('k', 0x22);
+    TWI_Master_Transmit_Byte('r', 0x44);
+}
+
+void test_twi_sr_poll()
+{
+    lcd_init();
+
+    TWI_Init(twi_conf_sr);
+
+    uint8 byte = TWI_Slave_Receive_Byte();
+    lcd_sendData(byte);
+    // uint8 bf[16] = {0};
+    // TWI_Slave_Receive_Buffer(bf, 16);
+    // lcd_displayString(bf);
 }

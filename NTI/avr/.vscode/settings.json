@@ -10,6 +10,7 @@
     "uart_interface.h": "c",
     "lcd_interface.h": "c",
     "dio_reg.h": "c",
-    "test.h": "c"
+    "test.h": "c",
+    "spi_interface.h": "c"
   }
 }
