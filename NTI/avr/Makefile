@@ -1,4 +1,4 @@
-SRC = 	main.c\
+# SRC = 	main.c\
 		LIB/Queue/Queue.c\
 		APP/application.c\
 		APP/calculator.c\
@@ -20,6 +20,18 @@ SRC = 	main.c\
 		HAL/L298_H_Bridge/L298_H_Bridge.c\
 		HAL/LM35/LM35.c\
 
+SRC = 	main.c\
+		APP/test.c\
+		LIB/Queue/Queue.c\
+		MCAL/GIE/GIE.c\
+		MCAL/DIO/dio.c\
+		MCAL/TIMER/timer.c\
+		MCAL/UART/UART.c\
+		HAL/FingerPrint/FP.c\
+		HAL/LCD/LCD.c\
+		# MCAL/SPI/SPI.c\
+		# MCAL/EEPROM/EEPROM.c\
+
 
 OBJ = $(subst .c,.o, $(SRC))
 
@@ -28,18 +40,19 @@ FLASHER = usbasp
 # F_CPU = 1000000UL 
 # F_CPU = 8000000UL 
 F_CPU = 16000000UL 
-BAUD  = 9600UL
+# BAUD  = 9600UL
 
 # CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU)  
-CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU) -DF_CPU=$(F_CPU) -DBAUD=$(BAUD)
+# CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU) -DF_CPU=$(F_CPU) -DBAUD=$(BAUD)
+CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU) -DF_CPU=$(F_CPU) 
 
 INCLUDE  = -I./utils
 INCLUDE += -I./MCAL
 INCLUDE += -I./HAL
 INCLUDE += -I/lib/avr/include
 
-LD_AVR = -L/lib/avr/lib/avr5 -latmega32a
-# LD_AVR = 
+# LD_AVR = -L/lib/avr/lib/avr5 -latmega32a
+LD_AVR = 
 
 all: compile build flash
 

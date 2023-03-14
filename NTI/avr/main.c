@@ -1,9 +1,9 @@
 // #include "APP/application.h"
-// #include "APP/test.h"
+#include "APP/test.h"
 // #include "APP/smart_fan.h"
-#include "APP/com_project_master.h"
-#include "APP/com_project_slave.h"
-void main()
+// #include "APP/com_project_master.h"
+// #include "APP/com_project_slave.h"
+int main()
 {
     // testLCD();
     // calc_app();
@@ -18,9 +18,14 @@ void main()
 
     // test_twi_mt_poll();
     // test_twi_sr_poll();
-    project_master_init();
-    project_master_app();
+
+    // project_master_init();
+    // project_master_app();
 
     // project_slave_init();
     // project_slave_app();
+    // test_eeprom_write();
+    // test_eeprom_read();
+    test_fp();
+    return 0;
 }

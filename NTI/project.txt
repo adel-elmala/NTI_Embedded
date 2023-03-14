@@ -1,0 +1,7 @@
+fingerprint sensor -> Simple UART protocol
+
+the OLED display -> I2C communication protocol
+
+ethernet -> uart
+ 
+ 

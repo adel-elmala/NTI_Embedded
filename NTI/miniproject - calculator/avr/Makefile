@@ -22,7 +22,7 @@ INCLUDE += -I./HAL
 INCLUDE += -I/lib/avr/include
 
 LD_AVR = -L/lib/avr/lib/avr5 -latmega32a
-LD_AVR = 
+# LD_AVR = 
 
 all: compile build flash
 

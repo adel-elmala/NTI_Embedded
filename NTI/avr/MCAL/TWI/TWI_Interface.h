@@ -21,12 +21,12 @@ typedef struct TWI_Config
 #define TWI_prescaler_64 3
 
 void TWI_Init(TWI_Config_t conf);
+
 bool TWI_Master_Transmit_Byte(uint8 byte, uint8 slave_adrr);
+bool TWI_Master_Transmit_Buffer(uint8 *buff, uint32 buff_size, uint8 slave_adrr);
 uint8 TWI_Master_Receive_Byte(uint8 slave_adrr);
 
-bool TWI_Master_Transmit_Buffer(uint8 *buff, uint32 buff_size, uint8 slave_adrr);
-
-// bool TWI_Slave_Transmit_Byte(uint8 byte);
+bool TWI_Slave_Transmit_Byte(uint8 byte);
 uint8 TWI_Slave_Receive_Byte(void);
 bool TWI_Slave_Receive_Buffer(char *buffer, uint32 buff_size);
 

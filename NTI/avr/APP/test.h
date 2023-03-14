@@ -10,5 +10,8 @@ void test_spi_master();
 void test_spi_slave();
 void test_twi_mt_poll();
 void test_twi_sr_poll();
+void test_eeprom_read();
+void test_eeprom_write();
+void test_fp();
 
 #endif

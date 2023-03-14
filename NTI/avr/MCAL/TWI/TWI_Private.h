@@ -22,9 +22,13 @@
 /* slave recieve status codes */
 
 #define SR_SLA_ACK (0x60)
+#define SR_GCALL_SLA_ACK (0x70)
 #define SR_ARBT_SLA_ACK (0x68)
 #define SR_DATA_ACK (0x80)
 #define SR_GCALL_DATA_ACK (0x90)
+
+#define SR_DATA_NACK (0x88)
+#define SR_GCALL_DATA_NACK (0x98)
 /* ------------------------ */
 
 /* ------- Error codes ------- */

@@ -2,6 +2,5 @@
 
 void main()
 {
-    // testLCD();
     calc_app();
 }

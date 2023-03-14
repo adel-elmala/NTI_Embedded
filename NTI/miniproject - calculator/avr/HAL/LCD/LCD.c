@@ -1,5 +1,5 @@
 #include "LCD_Interface.h"
-#define F_CPU 16000000UL
+// #define F_CPU 16000000UL
 
 #include "util/delay.h"
 void enablePulse(void)

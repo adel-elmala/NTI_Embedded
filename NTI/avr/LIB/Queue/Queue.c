@@ -67,7 +67,7 @@ bool q_isEmpty(Queue_Circular_t *q)
 
 bool q_isFull(Queue_Circular_t *q)
 {
-    if ((q->capacity == (QUEUE_MAX_SIZE - 1)) && ((q->wt_idx) == (q->rd_idx)))
+    if ((q->capacity == (QUEUE_MAX_SIZE)) && ((q->wt_idx) == (q->rd_idx)))
         return true;
     else
         return false;
