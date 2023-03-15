@@ -10,14 +10,15 @@
 
 // #include "../HAL/L298_H_Bridge/L298_H_Bridge_Interface.h"
 #include "../HAL/LCD/LCD_Interface.h"
+#include "../HAL/Servo/Servo_Interface.h"
 
 #include "../LIB/Queue/Queue.h"
 
 #include "../HAL/FingerPrint/FP_Interface.h"
 
 // #include "../MCAL/EEPROM/EEPROM_Interface.h"
+#include <stdio.h>
 
-// #include <stdio.h>
 // bool g_trans_comp = false;
 // void test_timer0()
 // {
@@ -282,28 +283,75 @@
 //     while (1)
 //         ;
 // }
-#include "../HAL/FingerPrint/FP_Private.h"
-void test_fp()
+// void test_fp()
+// {
+//     lcd_init();
+//     FP_Init();
+//     // lcd_displayString("READY");
+//     // lcd_displayString("init done");
+
+//     // uint8 status = FP_Verify_Password(9);
+//     uint8 thumb_id = 1;
+//     uint8 index_id = 2;
+//     uint8 middle_id = 3;
+//     FP_Save_Finger_Print(thumb_id);
+//     FP_Save_Finger_Print(index_id);
+//     FP_Save_Finger_Print(middle_id);
+//     // uint8 match_str[10] = {0};
+//     while (1)
+//     {
+
+//         uint16 match = FP_Match_Finger_Print();
+//         // sprintf((char *)match_str, "%d", match);
+//         lcd_sendData(match);
+//         TIMER0_Delay_ms_with_Blocking(3000);
+
+//         lcd_clearAndHome();
+//         switch (match)
+//         {
+//         case 1:
+//         {
+//             lcd_displayString("Thumb Finger");
+//             break;
+//         }
+
+//         case 2:
+//         {
+//             lcd_displayString("Index Finger");
+//             break;
+//         }
+
+//         case 3:
+//         {
+//             lcd_displayString("Middle Finger");
+//             break;
+//         }
+
+//         default:
+//         {
+//             lcd_displayString("No match");
+
+//             break;
+//         }
+//         }
+//         TIMER0_Delay_ms_with_Blocking(5000);
+//     }
+// }
+
+void test_servo()
 {
+    SERVO_Init();
     lcd_init();
-    FP_Init();
-    lcd_displayString("READY");
-    lcd_displayString("init done");
+    int counter = -90;
+    char str[5] = {0};
     while (1)
     {
-        // UART_vTransmit_poll('k');
-        // uint8 status = FP_Verify_Password(0);
-        uint8 status = FP_Collect_Image();
-
+        sprintf(str, "%d", counter);
         lcd_clearAndHome();
-        lcd_displayString("done");
-
-        if (status == ACK_FINGER_COLLECTION_SUCCESS)
-            // if (status == ACK_CORRECT_PASSWORD)
-            lcd_displayString("correct");
-        else
-            lcd_displayString("wrong");
-
-        TIMER0_Delay_ms_with_Blocking(1000);
+        lcd_displayString(str);
+        SERVO_Turn(counter++);
+        TIMER0_Delay_ms_with_Blocking(100);
+        if (counter > 90)
+            counter = -90;
     }
 }

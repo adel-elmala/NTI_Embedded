@@ -22,13 +22,15 @@
 
 SRC = 	main.c\
 		APP/test.c\
-		LIB/Queue/Queue.c\
 		MCAL/GIE/GIE.c\
 		MCAL/DIO/dio.c\
 		MCAL/TIMER/timer.c\
-		MCAL/UART/UART.c\
-		HAL/FingerPrint/FP.c\
+		MCAL/PWM/PWM.c\
 		HAL/LCD/LCD.c\
+		HAL/Servo/Servo.c\
+		# LIB/Queue/Queue.c\
+		# MCAL/UART/UART.c\
+		# HAL/FingerPrint/FP.c\
 		# MCAL/SPI/SPI.c\
 		# MCAL/EEPROM/EEPROM.c\
 

@@ -26,6 +26,7 @@ int main()
     // project_slave_app();
     // test_eeprom_write();
     // test_eeprom_read();
-    test_fp();
+    // test_fp();
+    test_servo();
     return 0;
 }

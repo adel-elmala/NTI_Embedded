@@ -17,15 +17,6 @@
 #define PACKET_LEN_SIZE 2
 #define PACKET_CHECKSUM_SIZE 2
 
-#define ACK_CORRECT_PASSWORD 0x00
-#define ACK_ERROR_RECEIVING 0x01
-#define ACK_WRONG_PASSWORD 0x13
-
-#define ACK_FINGER_COLLECTION_SUCCESS 0x00
-#define ACK_ERROR_RECEIVING 0x01
-#define ACK_CANNOT_FIND_FINGER 0x02
-#define ACK_FAILED_TO_COLLECT_FINGER 0x03
-
 // low bytes are stored first in the arrays
 typedef struct FP_Packet
 {
@@ -33,11 +24,11 @@ typedef struct FP_Packet
     uint8 adder[PACKET_ADDER_SIZE];
     uint8 id;
     uint8 len[PACKET_LEN_SIZE];
-    uint8 content[FP_PACKET_CONTENT_MAX_SIZE];
+    uint8 content[FP_PACKET_CONTENT_MAX_SIZE]; // data should be stored in big endian style (high bytes first)
     uint8 checksum[PACKET_CHECKSUM_SIZE];
 } FP_Packet_t;
 
-void FP_Init();
+// void FP_Init();
 bool send_packet(FP_Packet_t packet);
 bool receive_packet(FP_Packet_t *packet);
 uint16 calculate_checksum(FP_Packet_t packet);
