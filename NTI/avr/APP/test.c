@@ -19,6 +19,7 @@
 // #include "../MCAL/EEPROM/EEPROM_Interface.h"
 #include "../MCAL/StopWatch/StopWatch_Interface.h"
 #include <stdio.h>
+#include "../HAL/UltraSonic/UltraSonic_Interface.h"
 
 // bool g_trans_comp = false;
 // void test_timer0()
@@ -389,6 +390,23 @@ void test_stopwatch()
         lcd_goto_line2();
         sprintf(str, "%d", clk.u_seconds);
         lcd_displayString("uSec: ");
+        lcd_displayString(str);
+    }
+}
+
+void test_ultrasonic()
+{
+    TIMER0_SetConfig();
+    Ultrasonic_Init();
+    lcd_init();
+    char str[16] = {0};
+
+    while (1)
+    {
+        TIMER0_Delay_ms_with_Blocking(1000);
+        uint16 distance = Ultrasonic_Read_Distance();
+        sprintf(str, "%d cm", distance);
+        lcd_clearAndHome();
         lcd_displayString(str);
     }
 }

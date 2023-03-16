@@ -30,6 +30,8 @@ SRC = 	main.c\
 		HAL/Servo/Servo.c\
 		MCAL/EEPROM/EEPROM.c\
 		MCAL/StopWatch/StopWatch.c\
+		HAL/UltraSonic/UltraSonic.c\
+		MCAL/EXT_INT/External_INT.c\
 		# LIB/Queue/Queue.c\
 		# MCAL/UART/UART.c\
 		# HAL/FingerPrint/FP.c\

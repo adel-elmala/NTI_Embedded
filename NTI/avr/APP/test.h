@@ -15,5 +15,6 @@ void test_eeprom_write();
 void test_fp();
 void test_servo();
 void test_stopwatch();
+void test_ultrasonic();
 
 #endif

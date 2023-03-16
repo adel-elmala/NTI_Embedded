@@ -8,5 +8,6 @@
 
 #define ULTRASONIC_ECHO_PORT PORTD
 #define ULTRASONIC_ECHO_PIN PIN2
+void Ultrasonic_trigger();
 
 #endif
