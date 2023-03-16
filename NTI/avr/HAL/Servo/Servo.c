@@ -12,7 +12,8 @@ void SERVO_Init()
 }
 void SERVO_Turn(int degrees)
 {
-    double duty_cycle = (degrees * duty_cycle_per_degree) + SERVO_NEUTRAL_DUTY_CYCLE;
-    duty_cycle = 255.0 * (duty_cycle / 100.0);
-    PWM_Generate_CHANNELA(duty_cycle, 50);
+    // double duty_cycle = (degrees * duty_cycle_per_degree) + SERVO_NEUTRAL_DUTY_CYCLE;
+    // duty_cycle = 255.0 * (duty_cycle / 100.0);
+    // PWM_Generate_CHANNELA(duty_cycle, 50);
+    PWM_Generate_CHANNELA(degrees, 50);
 }

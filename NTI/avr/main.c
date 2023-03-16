@@ -27,6 +27,7 @@ int main()
     // test_eeprom_write();
     // test_eeprom_read();
     // test_fp();
-    test_servo();
+    // test_servo();
+    test_stopwatch();
     return 0;
 }

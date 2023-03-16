@@ -14,5 +14,6 @@ void test_eeprom_read();
 void test_eeprom_write();
 void test_fp();
 void test_servo();
+void test_stopwatch();
 
 #endif

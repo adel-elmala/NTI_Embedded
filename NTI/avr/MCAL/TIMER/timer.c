@@ -122,8 +122,8 @@ void TIMER0_Delay_ms_with_Blocking(uint16 Milli_Seconds)
     // calculate the correct prescale to make the time_to_overflow == 1 ms
     uint16 correct_prescaler = PRESCALER_64;
 
-    // uint8 ticks_to_1ms = 250; // for 16-MHZ clock
-    uint8 ticks_to_1ms = 125; // for 8-MHZ clock
+    uint8 ticks_to_1ms = 250; // for 16-MHZ clock
+    // uint8 ticks_to_1ms = 125; // for 8-MHZ clock
 
     // loop on Milli_Seconds and poll on the overflow flag and decrement Milli_Seconds
     switch (Config.Mode)
@@ -170,8 +170,8 @@ void TIMER0_Delay_us_with_Blocking(uint16 Micro_Seconds)
     // calculate the correct prescale to make the time_to_overflow == 1 ms
     uint16 correct_prescaler = PRESCALER_1;
 
-    // uint8 ticks_to_1us = 16 ; // for 16-MHZ clock
-    uint8 ticks_to_1us = 8; // for 8-MHZ clock
+    uint8 ticks_to_1us = 16; // for 16-MHZ clock
+    // uint8 ticks_to_1us = 8; // for 8-MHZ clock
 
     // loop on Milli_Seconds and poll on the overflow flag and decrement Milli_Seconds
     switch (Config.Mode)

@@ -28,11 +28,12 @@ SRC = 	main.c\
 		MCAL/PWM/PWM.c\
 		HAL/LCD/LCD.c\
 		HAL/Servo/Servo.c\
+		MCAL/EEPROM/EEPROM.c\
+		MCAL/StopWatch/StopWatch.c\
 		# LIB/Queue/Queue.c\
 		# MCAL/UART/UART.c\
 		# HAL/FingerPrint/FP.c\
 		# MCAL/SPI/SPI.c\
-		# MCAL/EEPROM/EEPROM.c\
 
 
 OBJ = $(subst .c,.o, $(SRC))
@@ -43,6 +44,8 @@ FLASHER = usbasp
 # F_CPU = 8000000UL 
 F_CPU = 16000000UL 
 # BAUD  = 9600UL
+HFUSE = 0xc2
+HFUSE_BITS = hfuse:w:$(HFUSE):m
 
 # CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU)  
 # CFLAGS = -Og -ggdb -Wall -mmcu=$(MCU) -DF_CPU=$(F_CPU) -DBAUD=$(BAUD)
@@ -74,7 +77,8 @@ build:
 	@avr-objcopy  -j .text -j .data -O ihex ./bin/main.elf ./bin/main.hex
 
 flash:build
-	avrdude -c $(FLASHER) -p $(MCU)  -U flash:w:./bin/main.hex
+	avrdude -c $(FLASHER) -p $(MCU) -U $(HFUSE_BITS) -U flash:w:./bin/main.hex
+	# avrdude -c $(FLASHER) -p $(MCU) -U flash:w:./bin/main.hex
 
 clean:
 	$(foreach file,$(OBJ),$(shell rm $(file)))

@@ -12,11 +12,12 @@
 #include "../HAL/LCD/LCD_Interface.h"
 #include "../HAL/Servo/Servo_Interface.h"
 
-#include "../LIB/Queue/Queue.h"
+// #include "../LIB/Queue/Queue.h"
 
-#include "../HAL/FingerPrint/FP_Interface.h"
+// #include "../HAL/FingerPrint/FP_Interface.h"
 
 // #include "../MCAL/EEPROM/EEPROM_Interface.h"
+#include "../MCAL/StopWatch/StopWatch_Interface.h"
 #include <stdio.h>
 
 // bool g_trans_comp = false;
@@ -338,20 +339,56 @@
 //     }
 // }
 
-void test_servo()
+// void test_servo()
+// {
+//     SERVO_Init();
+//     lcd_init();
+//     int counter = 0;
+//     char str[5] = {0};
+//     while (1)
+//     {
+//         sprintf(str, "%d", counter);
+//         lcd_clearAndHome();
+//         lcd_displayString(str);
+//         SERVO_Turn(counter++);
+//         TIMER0_Delay_ms_with_Blocking(1000);
+//         if (counter > 255)
+//             counter = 0;
+//         // SERVO_Turn(-88);
+//     }
+// }
+
+void test_stopwatch()
 {
-    SERVO_Init();
+    StopWatch_t clk;
+    uint8 str[12] = {0};
+
     lcd_init();
-    int counter = -90;
-    char str[5] = {0};
+    TIMER0_SetConfig();
+    DIO_vSetPortDirection(PORTC, OUTPUT);
+
+    StopWatch_Init();
+    StopWatch_Start(&clk);
+
     while (1)
     {
-        sprintf(str, "%d", counter);
+        TIMER0_Delay_ms_with_Blocking(3000);
+        StopWatch_Snap(&clk);
+        // DIO_vTogglePin(PORTC, PIN0);
+
         lcd_clearAndHome();
+
+        sprintf(str, "%d", clk.seconds);
+        lcd_displayString("Sec: ");
         lcd_displayString(str);
-        SERVO_Turn(counter++);
-        TIMER0_Delay_ms_with_Blocking(100);
-        if (counter > 90)
-            counter = -90;
+
+        sprintf(str, "%d", clk.milli_seconds);
+        lcd_displayString("  mSec: ");
+        lcd_displayString(str);
+
+        lcd_goto_line2();
+        sprintf(str, "%d", clk.u_seconds);
+        lcd_displayString("uSec: ");
+        lcd_displayString(str);
     }
 }
